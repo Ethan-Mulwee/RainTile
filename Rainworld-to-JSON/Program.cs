@@ -98,17 +98,16 @@ for (int i = 0; i < info.numLayers; i++) {
 
 List<Voxel> optimziedVoxels = new List<Voxel>();
 
+VoxelGrid voxelGrid_XOptimized = new VoxelGrid{
+    voxels = new Voxel?[48,48,48],
+    size = 48
+};
+
 // optimize elements
 for (int z = 0; z < voxelGrid.size; z++) {
     for (int y = 0; y < voxelGrid.size; y++) {
         for (int x = 0; x < voxelGrid.size; x++) {
             Voxel? voxelN = voxelGrid.voxels[x, y, z];
-            if (x+1 >= voxelGrid.size) {
-                if (voxelN != null) {
-                    optimziedVoxels.Add(voxelN.Value);
-                }
-                continue;
-            }
             
             int i = 1;
             if (voxelN != null) {
@@ -121,7 +120,37 @@ for (int z = 0; z < voxelGrid.size; z++) {
                         to = neighborVoxel.span.to,
                     };
                     voxelGrid.voxels[x+i, y, z] = null;
-                    
+
+                    i++;
+                }
+                voxelGrid_XOptimized.voxels[x,y,z] = voxel;
+                // optimziedVoxels.Add(voxel);
+            }
+        }
+    }
+}
+
+for (int z = 0; z < voxelGrid.size; z++) {
+    for (int x = 0; x < voxelGrid.size; x++) {
+        for (int y = 0; y < voxelGrid.size; y++) {
+            Voxel? voxelN = voxelGrid_XOptimized.voxels[x, y, z];
+            
+            int i = 1;
+            if (voxelN != null) {
+                Voxel voxel = voxelN.Value;
+                while (y+1 < voxelGrid.size && voxelGrid_XOptimized.voxels[x, y+i, z] != null) {
+
+                    Voxel neighborVoxel = voxelGrid_XOptimized.voxels[x, y+i, z].Value;
+                    if (voxel.span.to.X == neighborVoxel.span.to.X) {
+                        voxel.span = new VoxelSpan {
+                            from = voxel.span.from,
+                            to = neighborVoxel.span.to,
+                        };
+                        voxelGrid_XOptimized.voxels[x, y+i, z] = null;
+                    } else {
+                        break;
+                    }
+
                     i++;
                 }
                 optimziedVoxels.Add(voxel);
@@ -129,14 +158,6 @@ for (int z = 0; z < voxelGrid.size; z++) {
         }
     }
 }
-// for (int z = 0; z < voxelGrid.size; z++) {
-//     for (int y = 0; y < voxelGrid.size; y++) {
-//         for (int x = 0; x < voxelGrid.size; x++) {
-//             if (voxelGrid.voxels[x,y,z] != null)
-//                 optimziedVoxels.Add(voxelGrid.voxels[x,y,z].Value);
-//         }
-//     }
-// }
 
 // Convert voxel grid to minecraft elements
 for (int i = 0; i < optimziedVoxels.Count; i++) {

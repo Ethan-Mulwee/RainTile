@@ -23,37 +23,37 @@ Console.WriteLine($"{image.Height}x{image.Width}");
 
 MinecraftElement[] minecraftElements = {
     new MinecraftElement {
-        from = new int[]{0, 0, 0},
-        to = new int[]{0, 0, 0},
+        from = new int[]{2, 0, 5},
+        to = new int[]{4, 2, 7},
         rotation = new MinecraftRotation {
             angle = 0.0f,
             axis = "y",
-            origin = new int[]{0, 0, 0}
+            origin = new int[]{2, 0, 5}
         },
         color = 7,
         faces = new MinecraftFaces {
             north = new MinecraftFace {
-                uv = new int[]{0, 0, 0, 0},
+                uv = new int[]{0, 0, 2, 2},
                 texture = "#missing"
             },
             east = new MinecraftFace {
-                uv = new int[]{0, 0, 0, 0},
+                uv = new int[]{0, 0, 2, 2},
                 texture = "#missing"
             },
             south = new MinecraftFace {
-                uv = new int[]{0, 0, 0, 0},
+                uv = new int[]{0, 0, 2, 2},
                 texture = "#missing"
             },
             west = new MinecraftFace {
-                uv = new int[]{0, 0, 0, 0},
+                uv = new int[]{0, 0, 2, 2},
                 texture = "#missing"
             },
             up = new MinecraftFace {
-                uv = new int[]{0, 0, 0, 0},
+                uv = new int[]{0, 0, 2, 2},
                 texture = "#missing"
             },
             down = new MinecraftFace {
-                uv = new int[]{0, 0, 0, 0},
+                uv = new int[]{0, 0, 2, 2},
                 texture = "#missing"
             },
         }

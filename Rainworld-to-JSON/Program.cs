@@ -115,11 +115,15 @@ for (int z = 0; z < voxelGrid.size; z++) {
                 while (x+1 < voxelGrid.size && voxelGrid.voxels[x+i, y, z] != null) {
 
                     Voxel neighborVoxel = voxelGrid.voxels[x+i, y, z].Value;
-                    voxel.span = new VoxelSpan {
-                        from = voxel.span.from,
-                        to = neighborVoxel.span.to,
-                    };
-                    voxelGrid.voxels[x+i, y, z] = null;
+                    // if (i < 16) { // NOTE: you may need to limit size to 16 to avoid UV issues
+                        voxel.span = new VoxelSpan {
+                            from = voxel.span.from,
+                            to = neighborVoxel.span.to,
+                        };
+                        voxelGrid.voxels[x+i, y, z] = null;
+                    // } else {
+                    //     break;
+                    // }
 
                     i++;
                 }
@@ -129,6 +133,11 @@ for (int z = 0; z < voxelGrid.size; z++) {
         }
     }
 }
+
+VoxelGrid voxelGrid_YOptimized = new VoxelGrid{
+    voxels = new Voxel?[48,48,48],
+    size = 48
+};
 
 for (int z = 0; z < voxelGrid.size; z++) {
     for (int x = 0; x < voxelGrid.size; x++) {
@@ -153,6 +162,35 @@ for (int z = 0; z < voxelGrid.size; z++) {
 
                     i++;
                 }
+                voxelGrid_YOptimized.voxels[x,y,z] = voxel;
+            }
+        }
+    }
+}
+
+for (int x = 0; x < voxelGrid.size; x++) {
+    for (int y = 0; y < voxelGrid.size; y++) {
+        for (int z = 0; z < voxelGrid.size; z++) {
+            Voxel? voxelN = voxelGrid_YOptimized.voxels[x, y, z];
+            
+            int i = 1;
+            if (voxelN != null) {
+                Voxel voxel = voxelN.Value;
+                while (z+1 < voxelGrid.size && voxelGrid_YOptimized.voxels[x, y, z+i] != null) {
+
+                    Voxel neighborVoxel = voxelGrid_YOptimized.voxels[x, y, z+i].Value;
+                    if (voxel.span.to.X == neighborVoxel.span.to.X && voxel.span.to.Y == neighborVoxel.span.to.Y) {
+                        voxel.span = new VoxelSpan {
+                            from = voxel.span.from,
+                            to = neighborVoxel.span.to,
+                        };
+                        voxelGrid_YOptimized.voxels[x, y, z+i] = null;
+                    } else {
+                        break;
+                    }
+
+                    i++;
+                }
                 optimziedVoxels.Add(voxel);
             }
         }
@@ -162,6 +200,16 @@ for (int z = 0; z < voxelGrid.size; z++) {
 // Convert voxel grid to minecraft elements
 for (int i = 0; i < optimziedVoxels.Count; i++) {
     Voxel voxel = optimziedVoxels[i];
+    // top bottom UV
+    int U1 = voxel.span.from.X;
+    int U2 = voxel.span.to.X;
+    int V1 = ((info.numLayers - voxel.span.from.Z) * info.tileY) + voxel.span.from.Y + 1; 
+    int V2 = ((info.numLayers - voxel.span.from.Z) * info.tileY) + voxel.span.to.Y + 1; 
+
+
+
+    float UVScaleFactor = 1.0f; // (16.0f/40.0f);
+
     elementList.Add(new MinecraftElement {
         from = new int[]{voxel.span.from.X-16, voxel.span.from.Z-16, voxel.span.from.Y-16},
         to = new int[]{voxel.span.to.X-16, voxel.span.to.Z-16, voxel.span.to.Y-16},
@@ -173,28 +221,28 @@ for (int i = 0; i < optimziedVoxels.Count; i++) {
         color = 7,
         faces = new MinecraftFaces {
             north = new MinecraftFace {
-                uv = new int[]{0, 0, 1, 1},
-                texture = "#missing"
+                uv = new float[] {U1, V1, U2, V1+1},
+                texture = "#0"
             },
             east = new MinecraftFace {
-                uv = new int[]{0, 0, 1, 1},
-                texture = "#missing"
+                uv = new float[] {0, 0, 1, 1},
+                texture = "#0"
             },
             south = new MinecraftFace {
-                uv = new int[]{0, 0, 1, 1},
-                texture = "#missing"
+                uv = new float[] {U1, V1, U2, V1+1},
+                texture = "#0"
             },
             west = new MinecraftFace {
-                uv = new int[]{0, 0, 1, 1},
-                texture = "#missing"
+                uv = new float[] {0, 0, 1, 1},
+                texture = "#0"
             },
             up = new MinecraftFace {
-                uv = new int[]{0, 0, 1, 1},
-                texture = "#missing"
+                uv = new float[] {U1, V1, U2, V2},
+                texture = "#0"
             },
             down = new MinecraftFace {
-                uv = new int[]{0, 0, 1, 1},
-                texture = "#missing"
+                uv = new float[] {U1, V1, U2, V2},
+                texture = "#0"
             },
         }
     });

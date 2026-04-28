@@ -110,22 +110,21 @@ for (int z = 0; z < voxelGrid.size; z++) {
                 continue;
             }
             
-            Voxel? neighborVoxelN = voxelGrid.voxels[x+1, y, z];
-
+            int i = 1;
             if (voxelN != null) {
                 Voxel voxel = voxelN.Value;
-                if (neighborVoxelN != null) {
-                    Voxel neighborVoxel = neighborVoxelN.Value;
+                while (x+1 < voxelGrid.size && voxelGrid.voxels[x+i, y, z] != null) {
+
+                    Voxel neighborVoxel = voxelGrid.voxels[x+i, y, z].Value;
                     voxel.span = new VoxelSpan {
                         from = voxel.span.from,
                         to = neighborVoxel.span.to,
                     };
-                    neighborVoxel = voxel;
-                    x += 1;
-                    optimziedVoxels.Add(voxel);
-                } else {
-                    optimziedVoxels.Add(voxel);
+                    voxelGrid.voxels[x+i, y, z] = null;
+                    
+                    i++;
                 }
+                optimziedVoxels.Add(voxel);
             }
         }
     }

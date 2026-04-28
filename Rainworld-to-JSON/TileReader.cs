@@ -5,8 +5,27 @@ using System.Text.RegularExpressions;
 
 
 public static class TileReader {
-    public static TileInfo GetTileInfo(TileParameters parameters) {
-        return new TileInfo();
+    public static TileInfo CalculateTileInfo(TileParameters parameters) {
+        const int CELL_SIZE = 20;
+        const int PREVIEW_SIZE = 16;
+
+        int tileX = (parameters.SZx + parameters.BfTiles * 2) * CELL_SIZE;
+        int tileY = (parameters.SZy + parameters.BfTiles * 2) * CELL_SIZE;
+        int previewX = parameters.SZx * PREVIEW_SIZE;
+        int previewY = parameters.SZy * PREVIEW_SIZE;
+
+        int boundX = tileX;
+        int boundY = (tileY * parameters.RepeatL.Length) + previewY + 1;
+
+        return new TileInfo {
+            tileX = tileX,
+            tileY = tileY,
+            previewX = previewX,
+            previewY = previewY,
+            boundX = boundX,
+            boundY = boundY,
+            numLayers = parameters.RepeatL.Length,
+        };
     }
 
     public static TileParameters? GetTileParameters(string imagePath) {
@@ -96,4 +115,8 @@ public struct TileInfo {
     public int tileY;
     public int previewX;
     public int previewY;
+
+    public int boundX;
+    public int boundY;
+    public int numLayers;
 }

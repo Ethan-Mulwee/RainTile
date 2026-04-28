@@ -17,12 +17,16 @@ Png image = Png.Open(imageStreamSource);
 
 Pixel pixel = image.GetPixel(image.Width - 1, image.Height - 1);
 
-Console.WriteLine($"{image.Height}x{image.Width}");
+Console.WriteLine($"{image.Width}x{image.Height}");
 
 TileParameters? parametersNullable = TileReader.GetTileParameters(testPath);
 if (parametersNullable != null) {
     TileParameters parameters = parametersNullable.Value;
     Console.WriteLine($"sz({parameters.SZx}, {parameters.SZy}), bfTiles: {parameters.BfTiles}, repeatL: {string.Join(",", parameters.RepeatL)}");
+    TileInfo info = TileReader.CalculateTileInfo(parameters);
+    Console.WriteLine($"Correct bounds: {info.boundX}, {info.boundY}");
+    Console.WriteLine($"Number of layers defined: {info.numLayers}");
+    Console.WriteLine($"Layer Size: ({info.tileX}, {info.tileY})");
 }
 
 MinecraftElement[] minecraftElements = {

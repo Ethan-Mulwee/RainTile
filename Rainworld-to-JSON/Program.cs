@@ -27,6 +27,12 @@ Console.WriteLine($"Correct bounds: {info.boundX}, {info.boundY}");
 Console.WriteLine($"Number of layers defined: {info.numLayers}");
 Console.WriteLine($"Layer Size: ({info.tileX}, {info.tileY})");
 
+VoxelGrid voxelGrid = new VoxelGrid{
+    voxels = new Voxel?[48,48,48],
+    size = 48
+};
+
+// create voxel grid
 for (int i = 0; i < info.numLayers; i++) {
     for (int x = 0; x < info.tileX; x++) {
         for (int y = 0; y < info.tileY; y++) {
@@ -35,45 +41,143 @@ for (int i = 0; i < info.numLayers; i++) {
             PixelCoordinates modelCoords = new PixelCoordinates{X = x - 16, Y = y - 16};
             Pixel pixel = image.GetPixel(imageCoords.X, imageCoords.Y);
             if ((pixel.R * pixel.G * pixel.B) == 0) {
-                elementList.Add(new MinecraftElement {
-                    from = new int[]{modelCoords.X, (info.numLayers-i)+0, modelCoords.Y},
-                    to = new int[]{modelCoords.X+1, (info.numLayers-i)+1, modelCoords.Y+1},
-                    rotation = new MinecraftRotation {
-                        angle = 0.0f,
-                        axis = "y",
-                        origin = new int[]{0,0,0}
-                    },
-                    color = 7,
-                    faces = new MinecraftFaces {
-                        north = new MinecraftFace {
-                            uv = new int[]{0, 0, 1, 1},
-                            texture = "#missing"
+                voxelGrid.voxels[x,y,(info.numLayers-i)] = new Voxel {
+                    span = new VoxelSpan {
+                        from = new VoxelCoordinates {
+                            X = x,
+                            Y = y,
+                            Z = (info.numLayers-i)
                         },
-                        east = new MinecraftFace {
-                            uv = new int[]{0, 0, 1, 1},
-                            texture = "#missing"
-                        },
-                        south = new MinecraftFace {
-                            uv = new int[]{0, 0, 1, 1},
-                            texture = "#missing"
-                        },
-                        west = new MinecraftFace {
-                            uv = new int[]{0, 0, 1, 1},
-                            texture = "#missing"
-                        },
-                        up = new MinecraftFace {
-                            uv = new int[]{0, 0, 1, 1},
-                            texture = "#missing"
-                        },
-                        down = new MinecraftFace {
-                            uv = new int[]{0, 0, 1, 1},
-                            texture = "#missing"
+                        to = new VoxelCoordinates {
+                            X = x+1,
+                            Y = y+1,
+                            Z = (info.numLayers-i)+1
                         },
                     }
-                });
+                };
+                // elementList.Add(new MinecraftElement {
+                //     from = new int[]{modelCoords.X, (info.numLayers-i)+0, modelCoords.Y},
+                //     to = new int[]{modelCoords.X+1, (info.numLayers-i)+1, modelCoords.Y+1},
+                //     rotation = new MinecraftRotation {
+                //         angle = 0.0f,
+                //         axis = "y",
+                //         origin = new int[]{0,0,0}
+                //     },
+                //     color = 7,
+                //     faces = new MinecraftFaces {
+                //         north = new MinecraftFace {
+                //             uv = new int[]{0, 0, 1, 1},
+                //             texture = "#missing"
+                //         },
+                //         east = new MinecraftFace {
+                //             uv = new int[]{0, 0, 1, 1},
+                //             texture = "#missing"
+                //         },
+                //         south = new MinecraftFace {
+                //             uv = new int[]{0, 0, 1, 1},
+                //             texture = "#missing"
+                //         },
+                //         west = new MinecraftFace {
+                //             uv = new int[]{0, 0, 1, 1},
+                //             texture = "#missing"
+                //         },
+                //         up = new MinecraftFace {
+                //             uv = new int[]{0, 0, 1, 1},
+                //             texture = "#missing"
+                //         },
+                //         down = new MinecraftFace {
+                //             uv = new int[]{0, 0, 1, 1},
+                //             texture = "#missing"
+                //         },
+                //     }
+                // });
             }
         }
     }
+}
+
+List<Voxel> optimziedVoxels = new List<Voxel>();
+
+// optimize elements
+for (int z = 0; z < voxelGrid.size; z++) {
+    for (int y = 0; y < voxelGrid.size; y++) {
+        for (int x = 0; x < voxelGrid.size; x++) {
+            Voxel? voxelN = voxelGrid.voxels[x, y, z];
+            if (x+1 >= voxelGrid.size) {
+                if (voxelN != null) {
+                    optimziedVoxels.Add(voxelN.Value);
+                }
+                continue;
+            }
+            
+            Voxel? neighborVoxelN = voxelGrid.voxels[x+1, y, z];
+
+            if (voxelN != null) {
+                Voxel voxel = voxelN.Value;
+                if (neighborVoxelN != null) {
+                    Voxel neighborVoxel = neighborVoxelN.Value;
+                    voxel.span = new VoxelSpan {
+                        from = voxel.span.from,
+                        to = neighborVoxel.span.to,
+                    };
+                    neighborVoxel = voxel;
+                    x += 1;
+                    optimziedVoxels.Add(voxel);
+                } else {
+                    optimziedVoxels.Add(voxel);
+                }
+            }
+        }
+    }
+}
+// for (int z = 0; z < voxelGrid.size; z++) {
+//     for (int y = 0; y < voxelGrid.size; y++) {
+//         for (int x = 0; x < voxelGrid.size; x++) {
+//             if (voxelGrid.voxels[x,y,z] != null)
+//                 optimziedVoxels.Add(voxelGrid.voxels[x,y,z].Value);
+//         }
+//     }
+// }
+
+// Convert voxel grid to minecraft elements
+for (int i = 0; i < optimziedVoxels.Count; i++) {
+    Voxel voxel = optimziedVoxels[i];
+    elementList.Add(new MinecraftElement {
+        from = new int[]{voxel.span.from.X-16, voxel.span.from.Z-16, voxel.span.from.Y-16},
+        to = new int[]{voxel.span.to.X-16, voxel.span.to.Z-16, voxel.span.to.Y-16},
+        rotation = new MinecraftRotation {
+            angle = 0.0f,
+            axis = "y",
+            origin = new int[]{0,0,0}
+        },
+        color = 7,
+        faces = new MinecraftFaces {
+            north = new MinecraftFace {
+                uv = new int[]{0, 0, 1, 1},
+                texture = "#missing"
+            },
+            east = new MinecraftFace {
+                uv = new int[]{0, 0, 1, 1},
+                texture = "#missing"
+            },
+            south = new MinecraftFace {
+                uv = new int[]{0, 0, 1, 1},
+                texture = "#missing"
+            },
+            west = new MinecraftFace {
+                uv = new int[]{0, 0, 1, 1},
+                texture = "#missing"
+            },
+            up = new MinecraftFace {
+                uv = new int[]{0, 0, 1, 1},
+                texture = "#missing"
+            },
+            down = new MinecraftFace {
+                uv = new int[]{0, 0, 1, 1},
+                texture = "#missing"
+            },
+        }
+    });
 }
 
 MinecraftJSON model = new MinecraftJSON {

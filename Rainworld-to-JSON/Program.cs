@@ -19,7 +19,11 @@ Pixel pixel = image.GetPixel(image.Width - 1, image.Height - 1);
 
 Console.WriteLine($"{image.Height}x{image.Width}");
 
-TileReader.GetTileParameters(testPath);
+TileParameters? parametersNullable = TileReader.GetTileParameters(testPath);
+if (parametersNullable != null) {
+    TileParameters parameters = parametersNullable.Value;
+    Console.WriteLine($"sz({parameters.SZx}, {parameters.SZy}), bfTiles: {parameters.BfTiles}, repeatL: {string.Join(",", parameters.RepeatL)}");
+}
 
 MinecraftElement[] minecraftElements = {
     new MinecraftElement {

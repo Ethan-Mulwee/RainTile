@@ -9,7 +9,7 @@ public static class TileReader {
         return new TileInfo();
     }
 
-    public static TileParameters GetTileParameters(string imagePath) {
+    public static TileParameters? GetTileParameters(string imagePath) {
         string folder = Path.GetDirectoryName(imagePath);
         string initPath = folder + "/Init.txt";
         string initText = File.ReadAllText(initPath);
@@ -57,30 +57,38 @@ public static class TileReader {
             Match bfMatch = bfRegex.Match(line);
             Match repeatLMatch = repeatLRegex.Match(line);
 
-            if (szMatch == null) {
-                Console.WriteLine("#sz:point(x,y) parameter could not be found");
+            if (!szMatch.Success) {
+                throw new ArgumentException("#sz:point(x,y) parameter could not be found");
             }
-            if (bfMatch == null) {
-                Console.WriteLine("#bfTiles parameter could not be found");
+            if (!bfMatch.Success) {
+                throw new ArgumentException("#bfTiles parameter could not be found");
             }
-            if (repeatLMatch == null) {
-                Console.WriteLine("#repeatL parameter could not be found");
+            if (!repeatLMatch.Success) {
+                throw new ArgumentException("#repeatL parameter could not be found");
             }
 
             int sx = int.Parse(szMatch.Groups[1].Value);
             int sy = int.Parse(szMatch.Groups[2].Value);
+            int bfTiles = int.Parse(bfMatch.Groups[1].Value);
+            int[] repeatL = ParseIntList(repeatLMatch.Groups[1].Value);
 
-            Console.WriteLine($"SZ: ({sx}, {sy})");
+            // Console.WriteLine($"SZ: ({sx}, {sy})");
+            return new TileParameters{
+                SZx = sx,
+                SZy = sy,
+                BfTiles = bfTiles,
+                RepeatL = repeatL
+            };
         }
 
-        return new TileParameters();
+        return null;
     }
 }
 
 public struct TileParameters {
     public int SZx, SZy;
-    public int bfTiles;
-    public int[] repeatL; // should add up to 10
+    public int BfTiles;
+    public int[] RepeatL; // should add up to 10
 };
 
 public struct TileInfo {

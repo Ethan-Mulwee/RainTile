@@ -15,7 +15,8 @@ String testPath = "/home/ethan/Desktop/rained_v2.5.0_linux-x64/Data/Graphics/Bac
 Stream imageStreamSource = new FileStream(testPath, FileMode.Open, FileAccess.Read, FileShare.Read);
 Png image = Png.Open(imageStreamSource);
 
-Pixel pixel = image.GetPixel(image.Width - 1, image.Height - 1);
+Pixel pixel = image.GetPixel(0, 0); // 0,0 is at top left
+Console.WriteLine(pixel.R);
 
 Console.WriteLine($"{image.Width}x{image.Height}");
 
@@ -27,6 +28,12 @@ if (parametersNullable != null) {
     Console.WriteLine($"Correct bounds: {info.boundX}, {info.boundY}");
     Console.WriteLine($"Number of layers defined: {info.numLayers}");
     Console.WriteLine($"Layer Size: ({info.tileX}, {info.tileY})");
+    TileReader.PixelCoordinates layer0coords = TileReader.CalculateTopLeftLayerCoordiantes(info, 0);
+    TileReader.PixelCoordinates layer1coords = TileReader.CalculateTopLeftLayerCoordiantes(info, 1);
+    TileReader.PixelCoordinates layer2coords = TileReader.CalculateTopLeftLayerCoordiantes(info, 2);
+    Console.WriteLine($"Layer 0 top left coord: ({layer0coords.X}, {layer0coords.Y})");
+    Console.WriteLine($"Layer 1 top left coord: ({layer1coords.X}, {layer1coords.Y})");
+    Console.WriteLine($"Layer 2 top left coord: ({layer2coords.X}, {layer2coords.Y})");
 }
 
 MinecraftElement[] minecraftElements = {

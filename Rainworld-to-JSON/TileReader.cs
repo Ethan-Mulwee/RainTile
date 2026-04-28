@@ -28,6 +28,18 @@ public static class TileReader {
         };
     }
 
+    public struct PixelCoordinates {
+        public int X, Y;
+    }
+
+    public static PixelCoordinates CalculateTopLeftLayerCoordiantes(TileInfo tileInfo, int layerIndex) {
+        
+        return new PixelCoordinates {
+            X = 0,
+            Y = (layerIndex * tileInfo.tileY)+1
+        };
+    }
+
     public static TileParameters? GetTileParameters(string imagePath) {
         string folder = Path.GetDirectoryName(imagePath);
         string initPath = folder + "/Init.txt";

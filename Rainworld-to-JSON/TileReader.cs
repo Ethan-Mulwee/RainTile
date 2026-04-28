@@ -3,6 +3,9 @@ using BigGustave;
 using System.Data.SqlTypes;
 using System.Text.RegularExpressions;
 
+    public struct PixelCoordinates {
+        public int X, Y;
+    }
 
 public static class TileReader {
     public static TileInfo CalculateTileInfo(TileParameters parameters) {
@@ -28,9 +31,6 @@ public static class TileReader {
         };
     }
 
-    public struct PixelCoordinates {
-        public int X, Y;
-    }
 
     public static PixelCoordinates CalculateTopLeftLayerCoordiantes(TileInfo tileInfo, int layerIndex) {
         

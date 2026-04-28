@@ -19,6 +19,13 @@ Pixel pixel = image.GetPixel(image.Width - 1, image.Height - 1);
 
 Console.WriteLine($"{image.Height}x{image.Width}");
 
+string folder = Path.GetDirectoryName(testPath);
+Console.WriteLine(folder);
+string initPath = folder + "/Init.txt";
+
+// Stream initStream = new FileStream(initPath, FileMode.Open, FileAccess.Read, FileShare.Read);
+string initText = File.ReadAllText(initPath);
+Console.WriteLine(initText);
 
 
 MinecraftElement[] minecraftElements = {

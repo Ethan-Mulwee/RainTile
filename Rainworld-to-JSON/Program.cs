@@ -9,7 +9,7 @@ if (args.Length > 0) {
     Console.WriteLine($"First argument: {args[0]}");
 }
 
-String testPath = "/home/ethan/Desktop/rained_v2.5.0_linux-x64/Data/Graphics/Less Giant Screw.png";
+String testPath = "/home/ethan/Desktop/rained_v2.5.0_linux-x64/Data/Graphics/Background AC Fan.png";
 Stream imageStreamSource = new FileStream(testPath, FileMode.Open, FileAccess.Read, FileShare.Read);
 Png image = Png.Open(imageStreamSource);
 
@@ -28,8 +28,8 @@ Console.WriteLine($"Number of layers defined: {info.numLayers}");
 Console.WriteLine($"Layer Size: ({info.tileX}, {info.tileY})");
 
 VoxelGrid voxelGrid = new VoxelGrid{
-    voxels = new Voxel?[48,48,48],
-    size = 48
+    voxels = new Voxel?[128,128,128],
+    size = 128
 };
 
 // create voxel grid
@@ -99,8 +99,8 @@ for (int i = 0; i < info.numLayers; i++) {
 List<Voxel> optimziedVoxels = new List<Voxel>();
 
 VoxelGrid voxelGrid_XOptimized = new VoxelGrid{
-    voxels = new Voxel?[48,48,48],
-    size = 48
+    voxels = new Voxel?[128,128,128],
+    size = 128
 };
 
 // optimize elements
@@ -135,8 +135,8 @@ for (int z = 0; z < voxelGrid.size; z++) {
 }
 
 VoxelGrid voxelGrid_YOptimized = new VoxelGrid{
-    voxels = new Voxel?[48,48,48],
-    size = 48
+    voxels = new Voxel?[128,128,128],
+    size = 128
 };
 
 for (int z = 0; z < voxelGrid.size; z++) {
@@ -209,10 +209,11 @@ for (int i = 0; i < optimziedVoxels.Count; i++) {
 
 
     float UVScaleFactor = 1.0f; // (16.0f/40.0f);
+    float ModelScaleFactor = 0.25f;
 
     elementList.Add(new MinecraftElement {
-        from = new int[]{voxel.span.from.X-16, voxel.span.from.Z-16, voxel.span.from.Y-16},
-        to = new int[]{voxel.span.to.X-16, voxel.span.to.Z-16, voxel.span.to.Y-16},
+        from = new float[]{(voxel.span.from.X-16)*ModelScaleFactor, (voxel.span.from.Z-16)*ModelScaleFactor, (voxel.span.from.Y-16)*ModelScaleFactor},
+        to = new float[]{(voxel.span.to.X-16)*ModelScaleFactor, (voxel.span.to.Z-16)*ModelScaleFactor, (voxel.span.to.Y-16)*ModelScaleFactor},
         rotation = new MinecraftRotation {
             angle = 0.0f,
             axis = "y",

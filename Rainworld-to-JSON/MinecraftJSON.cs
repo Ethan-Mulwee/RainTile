@@ -11,8 +11,8 @@ public struct MinecraftJSON {
 }
 
 public struct MinecraftElement {
-    public int[] from { get; set; }
-    public int[] to { get; set; }
+    public float[] from { get; set; }
+    public float[] to { get; set; }
     public MinecraftRotation rotation { get; set; }
     public int color { get; set; }
     public MinecraftFaces faces { get; set; }

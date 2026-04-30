@@ -9,7 +9,7 @@ if (args.Length > 0) {
     Console.WriteLine($"First argument: {args[0]}");
 }
 
-String testPath = "/home/ethan/Desktop/rained_v2.5.0_linux-x64/Data/Graphics/Pillar Machine.png";
+String testPath = "/home/ethan/Desktop/rained_v2.5.0_linux-x64/Data/Graphics/Background AC Fan.png";
 Stream imageStreamSource = new FileStream(testPath, FileMode.Open, FileAccess.Read, FileShare.Read);
 Png image = Png.Open(imageStreamSource);
 
@@ -58,48 +58,11 @@ for (int i = 0; i < info.numLayers; i++) {
                         },
                     }
                 };
-                // elementList.Add(new MinecraftElement {
-                //     from = new int[]{modelCoords.X, (info.numLayers-i)+0, modelCoords.Y},
-                //     to = new int[]{modelCoords.X+1, (info.numLayers-i)+1, modelCoords.Y+1},
-                //     rotation = new MinecraftRotation {
-                //         angle = 0.0f,
-                //         axis = "y",
-                //         origin = new int[]{0,0,0}
-                //     },
-                //     color = 7,
-                //     faces = new MinecraftFaces {
-                //         north = new MinecraftFace {
-                //             uv = new int[]{0, 0, 1, 1},
-                //             texture = "#missing"
-                //         },
-                //         east = new MinecraftFace {
-                //             uv = new int[]{0, 0, 1, 1},
-                //             texture = "#missing"
-                //         },
-                //         south = new MinecraftFace {
-                //             uv = new int[]{0, 0, 1, 1},
-                //             texture = "#missing"
-                //         },
-                //         west = new MinecraftFace {
-                //             uv = new int[]{0, 0, 1, 1},
-                //             texture = "#missing"
-                //         },
-                //         up = new MinecraftFace {
-                //             uv = new int[]{0, 0, 1, 1},
-                //             texture = "#missing"
-                //         },
-                //         down = new MinecraftFace {
-                //             uv = new int[]{0, 0, 1, 1},
-                //             texture = "#missing"
-                //         },
-                //     }
-                // });
             }
         }
     }
 }
 
-// List<Voxel> optimziedVoxels = new List<Voxel>();
 
 VoxelGrid voxelGrid_XOptimized = new VoxelGrid{
     voxels = new Voxel?[256,256,256],
@@ -171,36 +134,6 @@ for (int z = 0; z < voxelGrid.size; z++) {
     }
 }
 
-
-// for (int x = 0; x < voxelGrid.size; x++) {
-//     for (int y = 0; y < voxelGrid.size; y++) {
-//         for (int z = 0; z < voxelGrid.size; z++) {
-//             Voxel? voxelN = voxelGrid_YOptimized.voxels[x, y, z];
-            
-//             int i = 1;
-//             if (voxelN != null) {
-//                 Voxel voxel = voxelN.Value;
-//                 while (z+1 < voxelGrid.size && voxelGrid_YOptimized.voxels[x, y, z+i] != null) {
-
-//                     Voxel neighborVoxel = voxelGrid_YOptimized.voxels[x, y, z+i].Value;
-//                     if (voxel.span.to.X == neighborVoxel.span.to.X && voxel.span.to.Y == neighborVoxel.span.to.Y) {
-//                         voxel.span = new VoxelSpan {
-//                             from = voxel.span.from,
-//                             to = neighborVoxel.span.to,
-//                         };
-//                         voxelGrid_YOptimized.voxels[x, y, z+i] = null;
-//                     } else {
-//                         break;
-//                     }
-
-//                     i++;
-//                 }
-//                 optimziedVoxels.Add(voxel);
-//             }
-//         }
-//     }
-// }
-
 List<Voxel> optimziedVoxels = new List<Voxel>();
 List<List<int>> layersIndicies = new List<List<int>>();
 int index = 0;
@@ -224,19 +157,26 @@ for (int z = 0; z < voxelGrid_YOptimized.size; z++) {
 for (int i = 0; i < optimziedVoxels.Count; i++) {
     Voxel voxel = optimziedVoxels[i];
     // top bottom UV
-    int U1 = voxel.span.from.X;
-    int U2 = voxel.span.to.X;
-    int V1 = ((info.numLayers - voxel.span.from.Z) * info.tileY) + voxel.span.from.Y + 1; 
-    int V2 = ((info.numLayers - voxel.span.from.Z) * info.tileY) + voxel.span.to.Y + 1; 
+    float UVScaleFactorU = (16.0f/image.Width);
+    float UVScaleFactorV = (16.0f/image.Height);
+
+    int U1i = voxel.span.from.X;
+    int U2i = voxel.span.to.X;
+    int V1i = ((info.numLayers - voxel.span.from.Z) * info.tileY) + voxel.span.from.Y + 1; 
+    int V2i = ((info.numLayers - voxel.span.from.Z) * info.tileY) + voxel.span.to.Y + 1; 
+
+    float U1 = U1i * UVScaleFactorU;
+    float U2 = U2i * UVScaleFactorU;
+    float V1 = V1i * UVScaleFactorV;
+    float V2 = V2i * UVScaleFactorV;
 
 
 
-    float UVScaleFactor = 1.0f; // (16.0f/40.0f);
     float ModelScaleFactor = 1.0f;
 
     elementList.Add(new MinecraftElement {
-        from = new float[]{(voxel.span.from.X-16)*ModelScaleFactor, (voxel.span.from.Y-16)*ModelScaleFactor, (voxel.span.from.Z)*ModelScaleFactor},
-        to = new float[]{(voxel.span.to.X-16)*ModelScaleFactor, (voxel.span.to.Y-16)*ModelScaleFactor, (voxel.span.to.Z)*ModelScaleFactor},
+        from = new float[]{(voxel.span.from.X-16)*ModelScaleFactor, (voxel.span.from.Z)*ModelScaleFactor, (voxel.span.from.Y-16)*ModelScaleFactor },
+        to = new float[]{(voxel.span.to.X-16)*ModelScaleFactor, (voxel.span.to.Z)*ModelScaleFactor, (voxel.span.to.Y-16)*ModelScaleFactor},
         rotation = new MinecraftRotation {
             angle = 0.0f,
             axis = "y",
@@ -245,7 +185,7 @@ for (int i = 0; i < optimziedVoxels.Count; i++) {
         color = 7,
         faces = new MinecraftFaces {
             north = new MinecraftFace {
-                uv = new float[] {U1, V1, U2, V1+1},
+                uv = new float[] {U1, V1, U2, V1+(1*UVScaleFactorV)},
                 texture = "#0"
             },
             east = new MinecraftFace {
@@ -253,7 +193,7 @@ for (int i = 0; i < optimziedVoxels.Count; i++) {
                 texture = "#0"
             },
             south = new MinecraftFace {
-                uv = new float[] {U1, V1, U2, V1+1},
+                uv = new float[] {U1, V2-(1*UVScaleFactorV), U2, V2},
                 texture = "#0"
             },
             west = new MinecraftFace {
@@ -308,3 +248,5 @@ string json = JsonSerializer.Serialize(model, options);
 minecraftModelWriter.Write(json);
 minecraftModelWriter.Close();
 minecraftModelStream.Close();
+
+// File.Copy(testPath, minecraftSafeName+".png");

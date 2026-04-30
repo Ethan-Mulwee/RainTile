@@ -185,11 +185,11 @@ for (int i = 0; i < optimziedVoxels.Count; i++) {
         color = 7,
         faces = new MinecraftFaces {
             north = new MinecraftFace {
-                uv = new float[] {U1, V1, U2, V1+(1*UVScaleFactorV)},
+                uv = new float[] {U2, V1, U1, V1+(1*UVScaleFactorV)},
                 texture = "#0"
             },
             east = new MinecraftFace {
-                uv = new float[] {0, 0, 1, 1},
+                uv = new float[] {U2-(1*UVScaleFactorU), V2, U2, V1},
                 texture = "#0"
             },
             south = new MinecraftFace {
@@ -197,7 +197,7 @@ for (int i = 0; i < optimziedVoxels.Count; i++) {
                 texture = "#0"
             },
             west = new MinecraftFace {
-                uv = new float[] {0, 0, 1, 1},
+                uv = new float[] {U1, V2, U1+(1*UVScaleFactorU), V1},
                 texture = "#0"
             },
             up = new MinecraftFace {

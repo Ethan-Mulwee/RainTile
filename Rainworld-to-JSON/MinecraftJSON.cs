@@ -9,6 +9,7 @@ public struct MinecraftJSON {
     public string credit { get; set; }
     public int[] texture_size { get; set; }
     public MinecraftElement[] elements { get; set; }
+    public MinecraftGroup[] groups { get; set; }
 }
 
 public struct MinecraftElement {
@@ -17,6 +18,14 @@ public struct MinecraftElement {
     public MinecraftRotation rotation { get; set; }
     public int color { get; set; }
     public MinecraftFaces faces { get; set; }
+}
+
+public struct MinecraftGroup {
+    public string name { get; set; }
+    public int[] origin { get; set; }
+    public int scope { get; set; }
+    public int color { get; set; }
+    public int[] children { get; set; }
 }
 
 public struct MinecraftRotation {

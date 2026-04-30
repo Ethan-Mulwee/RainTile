@@ -96,7 +96,7 @@ for (int i = 0; i < info.numLayers; i++) {
     }
 }
 
-List<Voxel> optimziedVoxels = new List<Voxel>();
+// List<Voxel> optimziedVoxels = new List<Voxel>();
 
 VoxelGrid voxelGrid_XOptimized = new VoxelGrid{
     voxels = new Voxel?[256,256,256],
@@ -168,33 +168,53 @@ for (int z = 0; z < voxelGrid.size; z++) {
     }
 }
 
-for (int x = 0; x < voxelGrid.size; x++) {
-    for (int y = 0; y < voxelGrid.size; y++) {
-        for (int z = 0; z < voxelGrid.size; z++) {
-            Voxel? voxelN = voxelGrid_YOptimized.voxels[x, y, z];
+
+// for (int x = 0; x < voxelGrid.size; x++) {
+//     for (int y = 0; y < voxelGrid.size; y++) {
+//         for (int z = 0; z < voxelGrid.size; z++) {
+//             Voxel? voxelN = voxelGrid_YOptimized.voxels[x, y, z];
             
-            int i = 1;
+//             int i = 1;
+//             if (voxelN != null) {
+//                 Voxel voxel = voxelN.Value;
+//                 while (z+1 < voxelGrid.size && voxelGrid_YOptimized.voxels[x, y, z+i] != null) {
+
+//                     Voxel neighborVoxel = voxelGrid_YOptimized.voxels[x, y, z+i].Value;
+//                     if (voxel.span.to.X == neighborVoxel.span.to.X && voxel.span.to.Y == neighborVoxel.span.to.Y) {
+//                         voxel.span = new VoxelSpan {
+//                             from = voxel.span.from,
+//                             to = neighborVoxel.span.to,
+//                         };
+//                         voxelGrid_YOptimized.voxels[x, y, z+i] = null;
+//                     } else {
+//                         break;
+//                     }
+
+//                     i++;
+//                 }
+//                 optimziedVoxels.Add(voxel);
+//             }
+//         }
+//     }
+// }
+
+List<Voxel> optimziedVoxels = new List<Voxel>();
+List<List<int>> layersIndicies = new List<List<int>>();
+int index = 0;
+for (int z = 0; z < voxelGrid_YOptimized.size; z++) {
+    List<int> layerIndices = new List<int>();
+    for (int y = 0; y < voxelGrid_YOptimized.size; y++) {
+        for (int x = 0; x < voxelGrid_YOptimized.size; x++) {
+            Voxel? voxelN = voxelGrid_YOptimized.voxels[x,y,z];
             if (voxelN != null) {
-                Voxel voxel = voxelN.Value;
-                while (z+1 < voxelGrid.size && voxelGrid_YOptimized.voxels[x, y, z+i] != null) {
-
-                    Voxel neighborVoxel = voxelGrid_YOptimized.voxels[x, y, z+i].Value;
-                    if (voxel.span.to.X == neighborVoxel.span.to.X && voxel.span.to.Y == neighborVoxel.span.to.Y) {
-                        voxel.span = new VoxelSpan {
-                            from = voxel.span.from,
-                            to = neighborVoxel.span.to,
-                        };
-                        voxelGrid_YOptimized.voxels[x, y, z+i] = null;
-                    } else {
-                        break;
-                    }
-
-                    i++;
-                }
-                optimziedVoxels.Add(voxel);
+                optimziedVoxels.Add(voxelN.Value);
+                layerIndices.Add(index);
+                index++;
             }
         }
     }
+    if (layerIndices.Count > 0)
+        layersIndicies.Add(layerIndices);
 }
 
 // Convert voxel grid to minecraft elements
@@ -212,8 +232,8 @@ for (int i = 0; i < optimziedVoxels.Count; i++) {
     float ModelScaleFactor = 1.0f;
 
     elementList.Add(new MinecraftElement {
-        from = new float[]{(voxel.span.from.X-16)*ModelScaleFactor, (voxel.span.from.Z-16)*ModelScaleFactor * 3.0f, (voxel.span.from.Y-16)*ModelScaleFactor},
-        to = new float[]{(voxel.span.to.X-16)*ModelScaleFactor, (voxel.span.to.Z-16)*ModelScaleFactor * 3.0f, (voxel.span.to.Y-16)*ModelScaleFactor},
+        from = new float[]{(voxel.span.from.X-16)*ModelScaleFactor, (voxel.span.from.Y-16)*ModelScaleFactor, (voxel.span.from.Z-16)*ModelScaleFactor * 3.0f},
+        to = new float[]{(voxel.span.to.X-16)*ModelScaleFactor, (voxel.span.to.Y-16)*ModelScaleFactor, (voxel.span.to.Z-16)*ModelScaleFactor * 3.0f},
         rotation = new MinecraftRotation {
             angle = 0.0f,
             axis = "y",
@@ -249,11 +269,24 @@ for (int i = 0; i < optimziedVoxels.Count; i++) {
     });
 }
 
+MinecraftGroup[] groups = new MinecraftGroup[layersIndicies.Count];
+for (int i = 0; i < groups.Length; i++) {
+    groups[i] = new MinecraftGroup {
+        name = $"layer{i}",
+        origin = new int[]{0,0,0},
+        scope = 0,
+        color = 0,
+        children = layersIndicies[i].ToArray()
+    };
+}
+
+
 MinecraftJSON model = new MinecraftJSON {
     format_version = MinecraftExportConstants.FORMAT_VERSION,
     credit = MinecraftExportConstants.CREDIT,
     texture_size = new int[]{image.Width, image.Height},
-    elements = elementList.ToArray()
+    elements = elementList.ToArray(),
+    groups = groups
 };
 
 JsonSerializerOptions options = new JsonSerializerOptions {

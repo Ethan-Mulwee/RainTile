@@ -17,6 +17,9 @@ Console.WriteLine($"{image.Width}x{image.Height}");
 
 List<MinecraftElement> elementList = new List<MinecraftElement>();
 
+string fileName = Path.GetFileNameWithoutExtension(testPath);
+string minecraftSafeName = fileName.Replace(" ", "_").ToLower();
+
 TileParameters? parametersNullable = TileReader.GetTileParameters(testPath);
 if (parametersNullable == null)
     return; 
@@ -232,8 +235,8 @@ for (int i = 0; i < optimziedVoxels.Count; i++) {
     float ModelScaleFactor = 1.0f;
 
     elementList.Add(new MinecraftElement {
-        from = new float[]{(voxel.span.from.X-16)*ModelScaleFactor, (voxel.span.from.Y-16)*ModelScaleFactor, (voxel.span.from.Z-16)*ModelScaleFactor * 3.0f},
-        to = new float[]{(voxel.span.to.X-16)*ModelScaleFactor, (voxel.span.to.Y-16)*ModelScaleFactor, (voxel.span.to.Z-16)*ModelScaleFactor * 3.0f},
+        from = new float[]{(voxel.span.from.X-16)*ModelScaleFactor, (voxel.span.from.Y-16)*ModelScaleFactor, (voxel.span.from.Z)*ModelScaleFactor},
+        to = new float[]{(voxel.span.to.X-16)*ModelScaleFactor, (voxel.span.to.Y-16)*ModelScaleFactor, (voxel.span.to.Z)*ModelScaleFactor},
         rotation = new MinecraftRotation {
             angle = 0.0f,
             axis = "y",
@@ -285,6 +288,10 @@ MinecraftJSON model = new MinecraftJSON {
     format_version = MinecraftExportConstants.FORMAT_VERSION,
     credit = MinecraftExportConstants.CREDIT,
     texture_size = new int[]{image.Width, image.Height},
+    textures = new MinecraftTextures {
+        texture0Path = minecraftSafeName,
+        particlePath = minecraftSafeName
+    },
     elements = elementList.ToArray(),
     groups = groups
 };
@@ -294,7 +301,7 @@ JsonSerializerOptions options = new JsonSerializerOptions {
     DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull
 };
 
-var minecraftModelStream = File.Open("Model.json", FileMode.Create);
+var minecraftModelStream = File.Open($"{minecraftSafeName}.json", FileMode.Create);
 var minecraftModelWriter = new StreamWriter(minecraftModelStream);
 string json = JsonSerializer.Serialize(model, options);
 

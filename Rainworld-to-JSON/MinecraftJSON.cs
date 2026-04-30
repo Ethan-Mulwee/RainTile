@@ -1,3 +1,4 @@
+using System.Text.Json.Serialization;
 
 public static class MinecraftExportConstants {
     public const string FORMAT_VERSION = "1.21.11";
@@ -8,8 +9,16 @@ public struct MinecraftJSON {
     public string format_version { get; set; }
     public string credit { get; set; }
     public int[] texture_size { get; set; }
+    public MinecraftTextures textures { get; set; }
     public MinecraftElement[] elements { get; set; }
     public MinecraftGroup[] groups { get; set; }
+}
+
+public struct MinecraftTextures {
+    [JsonPropertyName("0")]
+    public string texture0Path { get; set; }
+    [JsonPropertyName("particle")]
+    public string particlePath { get; set; }
 }
 
 public struct MinecraftElement {

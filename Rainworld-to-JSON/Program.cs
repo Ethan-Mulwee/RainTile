@@ -9,7 +9,7 @@ if (args.Length > 0) {
     Console.WriteLine($"First argument: {args[0]}");
 }
 
-String testPath = "/home/ethan/Desktop/rained_v2.5.0_linux-x64/Data/Graphics/Background AC Fan.png";
+String testPath = "/home/ethan/Desktop/rained_v2.5.0_linux-x64/Data/Graphics/Pillar Machine.png";
 Stream imageStreamSource = new FileStream(testPath, FileMode.Open, FileAccess.Read, FileShare.Read);
 Png image = Png.Open(imageStreamSource);
 
@@ -28,8 +28,8 @@ Console.WriteLine($"Number of layers defined: {info.numLayers}");
 Console.WriteLine($"Layer Size: ({info.tileX}, {info.tileY})");
 
 VoxelGrid voxelGrid = new VoxelGrid{
-    voxels = new Voxel?[128,128,128],
-    size = 128
+    voxels = new Voxel?[256,256,256],
+    size = 256
 };
 
 // create voxel grid
@@ -99,8 +99,8 @@ for (int i = 0; i < info.numLayers; i++) {
 List<Voxel> optimziedVoxels = new List<Voxel>();
 
 VoxelGrid voxelGrid_XOptimized = new VoxelGrid{
-    voxels = new Voxel?[128,128,128],
-    size = 128
+    voxels = new Voxel?[256,256,256],
+    size = 256
 };
 
 // optimize elements
@@ -135,8 +135,8 @@ for (int z = 0; z < voxelGrid.size; z++) {
 }
 
 VoxelGrid voxelGrid_YOptimized = new VoxelGrid{
-    voxels = new Voxel?[128,128,128],
-    size = 128
+    voxels = new Voxel?[256,256,256],
+    size = 256
 };
 
 for (int z = 0; z < voxelGrid.size; z++) {
@@ -209,11 +209,11 @@ for (int i = 0; i < optimziedVoxels.Count; i++) {
 
 
     float UVScaleFactor = 1.0f; // (16.0f/40.0f);
-    float ModelScaleFactor = 0.25f;
+    float ModelScaleFactor = 1.0f;
 
     elementList.Add(new MinecraftElement {
-        from = new float[]{(voxel.span.from.X-16)*ModelScaleFactor, (voxel.span.from.Z-16)*ModelScaleFactor, (voxel.span.from.Y-16)*ModelScaleFactor},
-        to = new float[]{(voxel.span.to.X-16)*ModelScaleFactor, (voxel.span.to.Z-16)*ModelScaleFactor, (voxel.span.to.Y-16)*ModelScaleFactor},
+        from = new float[]{(voxel.span.from.X-16)*ModelScaleFactor, (voxel.span.from.Z-16)*ModelScaleFactor * 3.0f, (voxel.span.from.Y-16)*ModelScaleFactor},
+        to = new float[]{(voxel.span.to.X-16)*ModelScaleFactor, (voxel.span.to.Z-16)*ModelScaleFactor * 3.0f, (voxel.span.to.Y-16)*ModelScaleFactor},
         rotation = new MinecraftRotation {
             angle = 0.0f,
             axis = "y",
@@ -252,6 +252,7 @@ for (int i = 0; i < optimziedVoxels.Count; i++) {
 MinecraftJSON model = new MinecraftJSON {
     format_version = MinecraftExportConstants.FORMAT_VERSION,
     credit = MinecraftExportConstants.CREDIT,
+    texture_size = new int[]{image.Width, image.Height},
     elements = elementList.ToArray()
 };
 

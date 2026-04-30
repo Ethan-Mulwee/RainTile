@@ -7,6 +7,7 @@ public static class MinecraftExportConstants {
 public struct MinecraftJSON {
     public string format_version { get; set; }
     public string credit { get; set; }
+    public int[] texture_size { get; set; }
     public MinecraftElement[] elements { get; set; }
 }
 

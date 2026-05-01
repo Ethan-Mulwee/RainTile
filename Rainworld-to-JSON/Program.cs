@@ -1,5 +1,6 @@
 ﻿
 using BigGustave;
+using System.Diagnostics;
 using System.Runtime.InteropServices;
 using System.Text.Json;
 using System.Text.Json.Serialization;
@@ -81,15 +82,15 @@ for (int z = 0; z < voxelGrid.size; z++) {
                 while (x+1 < voxelGrid.size && voxelGrid.voxels[x+i, y, z] != null) {
 
                     Voxel neighborVoxel = voxelGrid.voxels[x+i, y, z].Value;
-                    // if (i < 16) { // NOTE: you may need to limit size to 16 to avoid UV issues
+                    if (i < 16) { // NOTE: you may need to limit size to 16 to avoid UV issues
                         voxel.span = new VoxelSpan {
                             from = voxel.span.from,
                             to = neighborVoxel.span.to,
                         };
                         voxelGrid.voxels[x+i, y, z] = null;
-                    // } else {
-                    //     break;
-                    // }
+                    } else {
+                        break;
+                    }
 
                     i++;
                 }
@@ -116,7 +117,7 @@ for (int z = 0; z < voxelGrid.size; z++) {
                 while (y+1 < voxelGrid.size && voxelGrid_XOptimized.voxels[x, y+i, z] != null) {
 
                     Voxel neighborVoxel = voxelGrid_XOptimized.voxels[x, y+i, z].Value;
-                    if (voxel.span.to.X == neighborVoxel.span.to.X) {
+                    if (voxel.span.to.X == neighborVoxel.span.to.X && i < 16) {
                         voxel.span = new VoxelSpan {
                             from = voxel.span.from,
                             to = neighborVoxel.span.to,
@@ -172,7 +173,7 @@ for (int i = 0; i < optimziedVoxels.Count; i++) {
 
 
 
-    float ModelScaleFactor = 1.0f;
+    float ModelScaleFactor = 16.0f/20.0f;
 
     elementList.Add(new MinecraftElement {
         from = new float[]{(voxel.span.from.X-16)*ModelScaleFactor, (voxel.span.from.Z)*ModelScaleFactor, (voxel.span.from.Y-16)*ModelScaleFactor },
@@ -235,6 +236,8 @@ MinecraftJSON model = new MinecraftJSON {
     elements = elementList.ToArray(),
     groups = groups
 };
+
+Console.WriteLine(minecraftSafeName);
 
 JsonSerializerOptions options = new JsonSerializerOptions {
     WriteIndented = true,

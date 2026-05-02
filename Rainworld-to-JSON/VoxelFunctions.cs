@@ -32,6 +32,25 @@ public static class VoxelFunctions {
         }
     }
 
+    public enum MergingType {
+        XY,
+        XYZ
+    }
+
+    public static void MergeOptimize(VoxelGrid grid, MergingType type) {
+        switch (type) {
+            case MergingType.XY:
+                MergeX(grid);
+                MergeY(grid);
+                break;
+            case MergingType.XYZ:
+                MergeX(grid);
+                MergeY(grid);
+                MergeZ(grid);
+                break;
+        }
+    }
+
     private static void MergeWalk(VoxelGrid grid, Vector3Int coords, Axis axis) {
         if (grid.voxels[coords.X, coords.Y, coords.Z] is Voxel voxel) {
 
@@ -71,32 +90,5 @@ public static class VoxelFunctions {
                 return a.span.to.X == b.span.to.X && a.span.to.Y == b.span.to.Y;
         }
         return false;
-    }
-
-
-
-    private static void MergeWalkY(VoxelGrid grid, int x, int y, int z) {
-        if (grid.voxels[x, y, z] is Voxel voxel) {
-            int walkIdx = 1;
-            while (x + 1 < grid.size && grid.voxels[x + walkIdx, y, z] is Voxel neighborVoxel)
-            {
-                if (walkIdx < MERGE_LIMIT)
-                {
-                    voxel.span = new VoxelSpan
-                    {
-                        from = voxel.span.from,
-                        to = neighborVoxel.span.to,
-                    };
-                    grid.voxels[x + walkIdx, y, z] = null;
-                }
-                else
-                {
-                    break;
-                }
-
-                walkIdx++;
-            }
-            grid.voxels[x, y, z] = voxel;
-        }
     }
 }

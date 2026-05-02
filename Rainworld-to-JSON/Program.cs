@@ -2,6 +2,7 @@
 using BigGustave;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using static VoxelFunctions;
 
 String imagePath = "";
 if (args.Length > 0)
@@ -46,9 +47,8 @@ Console.WriteLine($"Layer Size: ({info.tileX}, {info.tileY})");
 
 VoxelGrid baseGrid = CreateVoxelGrid(image, info);
 
-VoxelFunctions.MergeX(baseGrid);
+MergeOptimize(baseGrid, MergingType.XY);
 
-VoxelFunctions.MergeY(baseGrid);
 
 // VoxelFunctions.MergeZ(baseGrid);
 
@@ -190,12 +190,12 @@ minecraftModelWriter.Write(json);
 minecraftModelWriter.Close();
 minecraftModelStream.Close();
 
-static VoxelGrid CreateVoxelGrid(Png image, TileInfo info)
-{
+static VoxelGrid CreateVoxelGrid(Png image, TileInfo info) {
+    int size = Math.Max(Math.Max(info.tileX, info.tileY), info.numLayers);
     VoxelGrid voxelGrid = new VoxelGrid
     {
-        voxels = new Voxel?[256, 256, 256],
-        size = 256
+        voxels = new Voxel?[size, size, size],
+        size = size
     };
 
     // create voxel grid

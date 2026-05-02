@@ -5,23 +5,19 @@ using System.Text.Json.Serialization;
 using static VoxelFunctions;
 
 String imagePath = "";
-if (args.Length > 0)
-{
+if (args.Length > 0) {
     imagePath = args[0];
 }
-else
-{
+else {
     Console.WriteLine("Error: Please provide a file path");
     return;
 }
 
 Stream imageStreamSource = null;
-try
-{
+try {
     imageStreamSource = new FileStream(imagePath, FileMode.Open, FileAccess.Read, FileShare.Read);
 }
-catch (Exception e)
-{
+catch (Exception e) {
     Console.WriteLine($"Error: Invalid file path: {imagePath}");
     Console.WriteLine(e);
     return;
@@ -29,43 +25,30 @@ catch (Exception e)
 
 Png image = Png.Open(imageStreamSource);
 
-Console.WriteLine($"{image.Width}x{image.Height}");
-
-
 string fileName = Path.GetFileNameWithoutExtension(imagePath);
 string minecraftSafeName = fileName.Replace(" ", "_").ToLower();
 
 TileParameters? parametersNullable = TileReader.GetTileParameters(imagePath);
-if (parametersNullable == null)
+if (parametersNullable == null) {
+    Console.WriteLine("Failed to read parameters, check if Init.txt is next to the file and the tile you're attempting to convert has a valid entry");
     return;
+}
+
 TileParameters parameters = parametersNullable.Value;
 TileInfo info = TileReader.CalculateTileInfo(parameters);
-Console.WriteLine($"sz({parameters.SZx}, {parameters.SZy}), bfTiles: {parameters.BfTiles}, repeatL: {string.Join(",", parameters.RepeatL)}");
-Console.WriteLine($"Correct bounds: {info.boundX}, {info.boundY}");
-Console.WriteLine($"Number of layers defined: {info.numLayers}");
-Console.WriteLine($"Layer Size: ({info.tileX}, {info.tileY})");
+VoxelGrid grid = CreateVoxelGrid(image, info);
 
-VoxelGrid baseGrid = CreateVoxelGrid(image, info);
-
-MergeOptimize(baseGrid, MergingType.XY);
-
-
-// VoxelFunctions.MergeZ(baseGrid);
+MergeOptimize(grid, MergingType.XY);
 
 List<Voxel> optimziedVoxels = new List<Voxel>();
 List<List<int>> layersIndicies = new List<List<int>>();
 int index = 0;
-for (int z = 0; z < baseGrid.size; z++)
-{
+for (int z = 0; z < grid.size; z++) {
     List<int> layerIndices = new List<int>();
-    for (int y = 0; y < baseGrid.size; y++)
-    {
-        for (int x = 0; x < baseGrid.size; x++)
-        {
-            Voxel? voxelN = baseGrid.voxels[x, y, z];
-            if (voxelN != null)
-            {
-                optimziedVoxels.Add(voxelN.Value);
+    for (int y = 0; y < grid.size; y++) {
+        for (int x = 0; x < grid.size; x++) {
+            if (grid.voxels[x, y, z] is Voxel voxel) {
+                optimziedVoxels.Add(voxel);
                 layerIndices.Add(index);
                 index++;
             }
@@ -78,8 +61,7 @@ for (int z = 0; z < baseGrid.size; z++)
 List<MinecraftElement> elementList = new List<MinecraftElement>();
 
 // Convert voxel grid to minecraft elements
-for (int i = 0; i < optimziedVoxels.Count; i++)
-{
+for (int i = 0; i < optimziedVoxels.Count; i++) {
     Voxel voxel = optimziedVoxels[i];
     // top bottom UV
     float UVScaleFactorU = (16.0f / image.Width);
@@ -104,7 +86,7 @@ for (int i = 0; i < optimziedVoxels.Count; i++)
         from = new float[] { (voxel.span.from.X - 16) * ModelScaleFactor, (voxel.span.from.Z) * ModelScaleFactor, (voxel.span.from.Y - 16) * ModelScaleFactor },
         to = new float[] { (voxel.span.to.X - 16) * ModelScaleFactor, (voxel.span.to.Z) * ModelScaleFactor, (voxel.span.to.Y - 16) * ModelScaleFactor },
         rotation = new MinecraftRotation
-        {
+{
             angle = 0.0f,
             axis = "y",
             origin = new int[] { 0, 0, 0 }
@@ -119,7 +101,8 @@ for (int i = 0; i < optimziedVoxels.Count; i++)
             },
             east = new MinecraftFace
             {
-                uv = new float[] { U2 - (1 * UVScaleFactorU), V2, U2, V1 },
+                uv = new float[] { U2, V1, U2 - (1 * UVScaleFactorU), V2 },
+                rotation = 90,
                 texture = "#0"
             },
             south = new MinecraftFace
@@ -147,10 +130,8 @@ for (int i = 0; i < optimziedVoxels.Count; i++)
 }
 
 MinecraftGroup[] groups = new MinecraftGroup[layersIndicies.Count];
-for (int i = 0; i < groups.Length; i++)
-{
-    groups[i] = new MinecraftGroup
-    {
+for (int i = 0; i < groups.Length; i++) {
+    groups[i] = new MinecraftGroup {
         name = $"layer{i}",
         origin = new int[] { 0, 0, 0 },
         scope = 0,
@@ -160,8 +141,7 @@ for (int i = 0; i < groups.Length; i++)
 }
 
 
-MinecraftJSON model = new MinecraftJSON
-{
+MinecraftJSON model = new MinecraftJSON {
     format_version = MinecraftExportConstants.FORMAT_VERSION,
     credit = MinecraftExportConstants.CREDIT,
     texture_size = new int[] { image.Width, image.Height },
@@ -174,10 +154,7 @@ MinecraftJSON model = new MinecraftJSON
     groups = groups
 };
 
-Console.WriteLine(minecraftSafeName);
-
-JsonSerializerOptions options = new JsonSerializerOptions
-{
+JsonSerializerOptions options = new JsonSerializerOptions {
     WriteIndented = true,
     DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull
 };

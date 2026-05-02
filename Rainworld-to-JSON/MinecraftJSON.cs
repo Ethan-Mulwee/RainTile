@@ -54,5 +54,6 @@ public struct MinecraftFaces {
 
 public struct MinecraftFace {
     public float[] uv { get; set; }
+    public int rotation { get; set; }
     public string texture { get; set; }
 }

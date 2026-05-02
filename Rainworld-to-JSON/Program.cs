@@ -28,6 +28,27 @@ Png image = Png.Open(imageStreamSource);
 string fileName = Path.GetFileNameWithoutExtension(imagePath);
 string minecraftSafeName = fileName.Replace(" ", "_").ToLower();
 
+FileStream minecraftModelStream = null;
+try {
+    minecraftModelStream = File.Open($"{minecraftSafeName}.json", FileMode.CreateNew);
+} catch (Exception e) {
+    if (e is IOException) {
+        Console.Write($"File '{minecraftSafeName}.json' already exists would you like to overwrite it? [y/N]: ");
+        string response = Console.ReadLine();
+        switch (response) {
+            case "y":
+            case "Y":
+            File.Open($"{minecraftSafeName}.json", FileMode.Create);
+                break;
+            default:
+                Console.WriteLine("Aborting");
+                return;
+                break;
+        }
+    }
+}
+var minecraftModelWriter = new StreamWriter(minecraftModelStream);
+
 TileParameters? parametersNullable = TileReader.GetTileParameters(imagePath);
 if (parametersNullable == null) {
     Console.WriteLine("Failed to read parameters, check if Init.txt is next to the file and the tile you're attempting to convert has a valid entry");
@@ -37,8 +58,7 @@ if (parametersNullable == null) {
 TileParameters parameters = parametersNullable.Value;
 TileInfo info = TileReader.CalculateTileInfo(parameters);
 VoxelGrid grid = CreateVoxelGrid(image, info);
-
-MergeOptimize(grid, MergingType.XY);
+MergeOptimize(grid, MergingType.XYZ);
 
 List<Voxel> optimziedVoxels = new List<Voxel>();
 List<List<int>> layersIndicies = new List<List<int>>();
@@ -76,8 +96,6 @@ for (int i = 0; i < optimziedVoxels.Count; i++) {
     float U2 = U2i * UVScaleFactorU;
     float V1 = V1i * UVScaleFactorV;
     float V2 = V2i * UVScaleFactorV;
-
-
 
     float ModelScaleFactor = 16.0f / 20.0f;
 
@@ -160,13 +178,31 @@ JsonSerializerOptions options = new JsonSerializerOptions {
     DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull
 };
 
-var minecraftModelStream = File.Open($"{minecraftSafeName}.json", FileMode.Create);
-var minecraftModelWriter = new StreamWriter(minecraftModelStream);
+
 string json = JsonSerializer.Serialize(model, options);
 
 minecraftModelWriter.Write(json);
 minecraftModelWriter.Close();
 minecraftModelStream.Close();
+
+try {
+    File.Copy(imagePath, minecraftSafeName+".png");
+} 
+catch (Exception e) {
+    if (e is IOException) {
+        Console.Write($"File '{minecraftSafeName}.png' already exists would you like to overwrite it? [y/N]: ");
+        string response = Console.ReadLine();
+        switch (response) {
+            case "y":
+            case "Y":
+            File.Copy(imagePath, minecraftSafeName+".png", true);
+                break;
+            default:
+                break;
+        }
+    }
+}
+Console.WriteLine($"Success, created {minecraftSafeName}.json and {minecraftSafeName}.png");
 
 // remove interior voxels NOTE: doing this before mergin will raise cube count this raises cube count
 // for (int z = 0; z < voxelGrid.size; z++) {
@@ -196,5 +232,3 @@ minecraftModelStream.Close();
 //         }
 //     }
 // }
-
-// File.Copy(testPath, minecraftSafeName+".png");

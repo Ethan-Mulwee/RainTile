@@ -1,111 +1,102 @@
 public static class VoxelFunctions {
 
-    public static void MergeX(VoxelGrid inputGrid)
-    {
-        int size = inputGrid.size;
+    public const int MERGE_LIMIT = 16;
 
-        for (int z = 0; z < size; z++) {
-            for (int y = 0; y < size; y++) {
-                for (int x = 0; x < size; x++) {
-                    // note that voxel is a copy here due to the nullable type
-                    if (inputGrid.voxels[x, y, z] is Voxel voxel)
-                    {
-                        int walkIdx = 1;
-                        while (x + 1 < size && inputGrid.voxels[x + walkIdx, y, z] is Voxel neighborVoxel)
-                        {
-                            if (walkIdx < 16)
-                            {
-                                voxel.span = new VoxelSpan
-                                {
-                                    from = voxel.span.from,
-                                    to = neighborVoxel.span.to,
-                                };
-                                inputGrid.voxels[x + walkIdx, y, z] = null;
-                            }
-                            else
-                            {
-                                break;
-                            }
-
-                            walkIdx++;
-                        }
-                        inputGrid.voxels[x, y, z] = voxel;
-                    }
+    public static void MergeX(VoxelGrid grid) {
+        for (int z = 0; z < grid.size; z++) {
+            for (int y = 0; y < grid.size; y++) {
+                for (int x = 0; x < grid.size; x++) {
+                    MergeWalk(grid, new Vector3Int(x, y, z), Axis.X);
                 }
             }
         }
     }
 
     public static void MergeY(VoxelGrid grid) {
-
         for (int z = 0; z < grid.size; z++) {
             for (int x = 0; x < grid.size; x++) {
                 for (int y = 0; y < grid.size; y++) {
-
-                    if (grid.voxels[x, y, z] is Voxel voxel) {
-
-                        int walkIdx = 1;
-
-                        while (y + 1 < grid.size && grid.voxels[x, y + walkIdx, z] != null) {
-
-                            Voxel neighborVoxel = grid.voxels[x, y + walkIdx, z].Value;
-                            if (voxel.span.to.X == neighborVoxel.span.to.X && walkIdx < 16) {
-                                voxel.span = new VoxelSpan {
-                                    from = voxel.span.from,
-                                    to = neighborVoxel.span.to,
-                                };
-                                grid.voxels[x, y + walkIdx, z] = null;
-                            }
-                            else
-                            {
-                                break;
-                            }
-
-                            walkIdx++;
-                        }
-
-                        grid.voxels[x, y, z] = voxel;
-
-                    }
+                    MergeWalk(grid, new Vector3Int(x,y,z), Axis.Y);
                 }
-
             }
         }
     }
-    
+
     public static void MergeZ(VoxelGrid grid) {
-
-        int size = grid.size;
-
-        for (int x = 0; x < size; x++) {
-            for (int y = 0; y < size; y++) {
-                for (int z = 0; z < size; z++) {
-
-                    if (grid.voxels[x, y, z] is Voxel voxel) {
-
-                        int walkIdx = 1;
-
-                        while (z+1 < size && grid.voxels[x, y, z+walkIdx] is Voxel neighborVoxel) {
-                            if (voxel.span.to.X == neighborVoxel.span.to.X && voxel.span.to.Y == neighborVoxel.span.to.Y) {
-                                voxel.span = new VoxelSpan {
-                                    from = voxel.span.from,
-                                    to = neighborVoxel.span.to,
-                                };
-                                grid.voxels[x, y, z+walkIdx] = null;
-                            } 
-                            else {
-                                break;
-                            }
-
-                            walkIdx++;
-                        }
-
-                        grid.voxels[x,y,z] = voxel;
-
-                    }
-
+        for (int x = 0; x < grid.size; x++) {
+            for (int y = 0; y < grid.size; y++) {
+                for (int z = 0; z < grid.size; z++) {
+                    MergeWalk(grid, new Vector3Int(x,y,z), Axis.Z);
                 }
             }
+        }
+    }
+
+    private static void MergeWalk(VoxelGrid grid, Vector3Int coords, Axis axis) {
+        if (grid.voxels[coords.X, coords.Y, coords.Z] is Voxel voxel) {
+
+            int walkIdx = 1;
+
+            Vector3Int neighborCoords = new Vector3Int(coords);
+            neighborCoords[(int)axis] += 1;
+
+            while (neighborCoords[(int)axis] < grid.size && grid.voxels[neighborCoords.X, neighborCoords.Y, neighborCoords.Z] is Voxel neighborVoxel) {
+                if (walkIdx < MERGE_LIMIT && MatchingSpans(voxel, neighborVoxel, axis)) {
+                    voxel.span = new VoxelSpan {
+                        from = voxel.span.from,
+                        to = neighborVoxel.span.to,
+                    };
+                    grid.voxels[neighborCoords.X, neighborCoords.Y, neighborCoords.Z] = null;
+                    neighborCoords[(int)axis] += 1;
+                }
+                else {
+                    break;
+                }
+
+                walkIdx++;
+            }
+
+            grid.voxels[coords.X, coords.Y, coords.Z] = voxel;
+        }
+    }
+
+    // Assumes that voxels are next to each other, i.e. doesn't check from only to
+    private static bool MatchingSpans(Voxel a, Voxel b, Axis axis) {
+        switch (axis) {
+            case Axis.X:
+                return a.span.to.Y == b.span.to.Y && a.span.to.Z == b.span.to.Z;
+            case Axis.Y:
+                return a.span.to.X == b.span.to.X && a.span.to.Z == b.span.to.Z;
+            case Axis.Z:
+                return a.span.to.X == b.span.to.X && a.span.to.Y == b.span.to.Y;
+        }
+        return false;
+    }
+
+
+
+    private static void MergeWalkY(VoxelGrid grid, int x, int y, int z) {
+        if (grid.voxels[x, y, z] is Voxel voxel) {
+            int walkIdx = 1;
+            while (x + 1 < grid.size && grid.voxels[x + walkIdx, y, z] is Voxel neighborVoxel)
+            {
+                if (walkIdx < MERGE_LIMIT)
+                {
+                    voxel.span = new VoxelSpan
+                    {
+                        from = voxel.span.from,
+                        to = neighborVoxel.span.to,
+                    };
+                    grid.voxels[x + walkIdx, y, z] = null;
+                }
+                else
+                {
+                    break;
+                }
+
+                walkIdx++;
+            }
+            grid.voxels[x, y, z] = voxel;
         }
     }
 }

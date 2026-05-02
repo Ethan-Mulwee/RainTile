@@ -50,7 +50,7 @@ VoxelFunctions.MergeX(baseGrid);
 
 VoxelFunctions.MergeY(baseGrid);
 
-VoxelFunctions.MergeZ(baseGrid);
+// VoxelFunctions.MergeZ(baseGrid);
 
 List<Voxel> optimziedVoxels = new List<Voxel>();
 List<List<int>> layersIndicies = new List<List<int>>();
@@ -215,13 +215,13 @@ static VoxelGrid CreateVoxelGrid(Png image, TileInfo info)
                     {
                         span = new VoxelSpan
                         {
-                            from = new VoxelCoordinates
+                            from = new Vector3Int
                             {
                                 X = x,
                                 Y = y,
                                 Z = (info.numLayers - i)
                             },
-                            to = new VoxelCoordinates
+                            to = new Vector3Int
                             {
                                 X = x + 1,
                                 Y = y + 1,

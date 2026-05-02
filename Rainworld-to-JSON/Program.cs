@@ -190,53 +190,6 @@ minecraftModelWriter.Write(json);
 minecraftModelWriter.Close();
 minecraftModelStream.Close();
 
-static VoxelGrid CreateVoxelGrid(Png image, TileInfo info) {
-    int size = Math.Max(Math.Max(info.tileX, info.tileY), info.numLayers);
-    VoxelGrid voxelGrid = new VoxelGrid
-    {
-        voxels = new Voxel?[size, size, size],
-        size = size
-    };
-
-    // create voxel grid
-    for (int i = 0; i < info.numLayers; i++)
-    {
-        for (int x = 0; x < info.tileX; x++)
-        {
-            for (int y = 0; y < info.tileY; y++)
-            {
-                PixelCoordinates layerOffset = TileReader.CalculateTopLeftLayerCoordiantes(info, i);
-                PixelCoordinates imageCoords = new PixelCoordinates { X = layerOffset.X + x, Y = layerOffset.Y + y };
-                PixelCoordinates modelCoords = new PixelCoordinates { X = x - 16, Y = y - 16 };
-                Pixel pixel = image.GetPixel(imageCoords.X, imageCoords.Y);
-                if ((pixel.R * pixel.G * pixel.B) == 0)
-                {
-                    voxelGrid.voxels[x, y, (info.numLayers - i)] = new Voxel
-                    {
-                        span = new VoxelSpan
-                        {
-                            from = new Vector3Int
-                            {
-                                X = x,
-                                Y = y,
-                                Z = (info.numLayers - i)
-                            },
-                            to = new Vector3Int
-                            {
-                                X = x + 1,
-                                Y = y + 1,
-                                Z = (info.numLayers - i) + 1
-                            },
-                        }
-                    };
-                }
-            }
-        }
-    }
-
-    return voxelGrid;
-}
-
 // remove interior voxels NOTE: doing this before mergin will raise cube count this raises cube count
 // for (int z = 0; z < voxelGrid.size; z++) {
 //     for (int y = 0; y < voxelGrid.size; y++) {

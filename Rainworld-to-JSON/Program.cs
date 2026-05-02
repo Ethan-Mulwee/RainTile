@@ -147,7 +147,7 @@ for (int i = 0; i < optimziedVoxels.Count; i++) {
             },
             down = new MinecraftFace
             {
-                uv = new float[] { U1, V1, U2, V2 },
+                uv = new float[] { U1, V2, U2, V1 },
                 texture = "#0"
             },
         }

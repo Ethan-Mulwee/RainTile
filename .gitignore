@@ -4,3 +4,6 @@
 /RainTileLib/obj
 /RainTileGUI/obj
 /RainTileCLI/obj
+/RainTileCLI/bin
+/RainTileGUI/bin
+/RainTileLib/bin

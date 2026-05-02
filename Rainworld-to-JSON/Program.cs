@@ -13,6 +13,11 @@ else {
     return;
 }
 
+String outputPath = "";
+if (args.Length > 1) {
+    outputPath = args[1];
+}
+
 Stream imageStreamSource = null;
 try {
     imageStreamSource = new FileStream(imagePath, FileMode.Open, FileAccess.Read, FileShare.Read);
@@ -31,14 +36,15 @@ string minecraftSafeName = fileName.Replace(" ", "_").ToLower();
 FileStream minecraftModelStream = null;
 try {
     minecraftModelStream = File.Open($"{minecraftSafeName}.json", FileMode.CreateNew);
-} catch (Exception e) {
+} 
+catch (Exception e) {
     if (e is IOException) {
         Console.Write($"File '{minecraftSafeName}.json' already exists would you like to overwrite it? [y/N]: ");
         string response = Console.ReadLine();
         switch (response) {
             case "y":
             case "Y":
-            File.Open($"{minecraftSafeName}.json", FileMode.Create);
+            minecraftModelStream = File.Open($"{minecraftSafeName}.json", FileMode.Create);
                 break;
             default:
                 Console.WriteLine("Aborting");
@@ -58,7 +64,7 @@ if (parametersNullable == null) {
 TileParameters parameters = parametersNullable.Value;
 TileInfo info = TileReader.CalculateTileInfo(parameters);
 VoxelGrid grid = CreateVoxelGrid(image, info);
-MergeOptimize(grid, MergingType.XYZ);
+MergeOptimize(grid, MergingType.XY);
 
 List<Voxel> optimziedVoxels = new List<Voxel>();
 List<List<int>> layersIndicies = new List<List<int>>();

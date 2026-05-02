@@ -112,7 +112,8 @@ for (int i = 0; i < optimziedVoxels.Count; i++) {
             },
             west = new MinecraftFace
             {
-                uv = new float[] { U1, V2, U1 + (1 * UVScaleFactorU), V1 },
+                uv = new float[] { U1 + (1 * UVScaleFactorU), V2, U1, V1 },
+                rotation = 90,
                 texture = "#0"
             },
             up = new MinecraftFace

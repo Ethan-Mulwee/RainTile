@@ -37,8 +37,8 @@ class Program
         rootCommand.Options.Add(initPathOption);
         rootCommand.Options.Add(outputPathOption);
         rootCommand.Options.Add(yesOption);
-        rootCommand.Options.Add(shellOption);
-        rootCommand.Options.Add(mergeVerticalOption);
+        // rootCommand.Options.Add(shellOption);
+        // rootCommand.Options.Add(mergeVerticalOption); TODO: implement 
 
         rootCommand.SetAction(parseResult => {
             FileInfo? tilePathInfo = parseResult.GetValue(tilePathArgument);

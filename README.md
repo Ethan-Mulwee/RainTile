@@ -8,13 +8,15 @@ basic usage
 ./RainTileCLI (path to png) 
 ```
 
-the output file will be put in the current directory and named automatically if no apth is specified. Otherwise you can set one with `-o` or `--output`
+the output file will be put in the current directory and named automatically if no path is specified. Otherwise you can set one with `-o` or `--output`
+
 
 ```bash
 ./RainTileCLI "Background AC Fan.png" -o fizz/buzz.json
 ```
+The name automatically given will be in all lower case and have the spaces replaced with '_' for Minecraft compatibility `Background AC Fan.png` becomes `background_ac_fan.json`
 
-If you want to automatically convert all the files in a directory with bash you can do this
+If you want to automatically convert all the files in a directory with bash you can do this.
 ```bash
 for f in *.png; do ./RainTileCLI "$f" -n; done
 ```

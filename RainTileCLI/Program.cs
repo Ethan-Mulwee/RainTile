@@ -41,8 +41,8 @@ class Program
         rootCommand.Options.Add(outputPathOption);
         rootCommand.Options.Add(yesOption);
         rootCommand.Options.Add(noOption);
-        // rootCommand.Options.Add(shellOption);
-        // rootCommand.Options.Add(mergeVerticalOption); TODO: implement 
+        rootCommand.Options.Add(shellOption);  // TODO: implement 
+        rootCommand.Options.Add(mergeVerticalOption);
 
         rootCommand.SetAction(parseResult => {
             FileInfo? tilePathInfo = parseResult.GetValue(tilePathArgument);
@@ -50,7 +50,8 @@ class Program
             FileInfo? outputPathInfoNullable = parseResult.GetValue(outputPathOption);
             bool yesOptionValue = parseResult.GetValue(yesOption);
             bool noOptionValue = parseResult.GetValue(noOption);
-
+            bool shellOptionValue = parseResult.GetValue(shellOption);
+            bool mergeVerticalOptionValue = parseResult.GetValue(mergeVerticalOption);
 
 
             if (tilePathInfo == null || !tilePathInfo.Exists) {
@@ -103,6 +104,11 @@ class Program
                 mergeType = MergingType.XY,
                 shell = false
             };
+
+            if (mergeVerticalOptionValue)
+                settings.mergeType = MergingType.XYZ;
+            if (shellOptionValue)
+                settings.shell = true;
 
             VoxelGrid tileGrid = ConvertTileToVoxel(tile, settings);
             string tileJson = ConvertVoxelToJson(tile, $"{mctileName}", tileGrid);

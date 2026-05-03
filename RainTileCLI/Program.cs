@@ -55,6 +55,7 @@ class Program
 
             string tilePath = tilePathInfo.FullName;
             string tileName = Path.GetFileNameWithoutExtension(tilePath);
+            string mctileName = tileName.Replace(" ", "_").ToLower();
             string tileDirectory = tilePathInfo.Directory.FullName;
             string initPath;
 
@@ -101,17 +102,26 @@ class Program
             };
 
             VoxelGrid tileGrid = ConvertTileToVoxel(tile, settings);
-            string tileJson = ConvertVoxelToJson(tile, $"{tileName}", tileGrid);
+            string tileJson = ConvertVoxelToJson(tile, $"{mctileName}", tileGrid);
 
-            string outputTilePath = $"{tileName}.json";
+            string outputTilePath = $"{mctileName}.json";
             if (outputPathInfoNullable != null) {
                 if (outputPathInfoNullable.Directory.Exists) {
-                    outputTilePath = outputPathInfoNullable.FullName;
+                    if (Path.GetExtension(outputPathInfoNullable.FullName) == "") {
+                        // Directory case
+                        outputTilePath = Path.Join(outputPathInfoNullable.FullName, outputTilePath);
+                    } else {
+                        // File case
+                        outputTilePath = outputPathInfoNullable.FullName;
+                    }
                 } else {
                     Console.WriteLine("Error: invalid output path aborting");
                     return;
                 }
             }
+
+
+
             if (Path.Exists(outputTilePath) && !yesOptionValue) {
                 Console.Write($"'{outputTilePath}' already exists would you like to overwrite it? [y/N]: ");
                 string response = Console.ReadLine();

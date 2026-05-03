@@ -209,8 +209,10 @@ public static class TileConversion {
         };
     }
 
+    // TODO: for some reason this returns null on windows find out why
     public static TileParameters? GetTileParameters(string tileName, string initPath) {
         string initText = File.ReadAllText(initPath);
+        // Console.WriteLine(initText);
 
         Regex nameRegex = new Regex("#nm\\s*:\\s*\"([^\"]*)\"", RegexOptions.IgnoreCase);
         Regex szRegex = new Regex(@"#sz\s*:\s*point\s*\(\s*(\d+)\s*,\s*(\d+)\s*\)", RegexOptions.IgnoreCase);

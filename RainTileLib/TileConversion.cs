@@ -180,8 +180,8 @@ public static class TileConversion {
         int sx = image.Width / 20;
         int sy = -1;
         int numLayers = -1;
-        for (int a = 0; a < 10; a++) {
-            for (int b = 0; b < 10; b++) {
+        for (int a = 1; a < 10; a++) {
+            for (int b = 1; b < 10; b++) {
                 int bound = a*b*20+a*16;
                 if (bound == image.Height-1) {
                     sy = a;

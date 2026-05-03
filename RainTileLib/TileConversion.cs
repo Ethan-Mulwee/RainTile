@@ -247,7 +247,7 @@ public static class TileConversion {
     }
 
     public static void LogParameters(TileParameters p) {
-        Console.WriteLine($"SZ:({p.SZx}, {p.SZy}), bfTiles: {p.BfTiles}, ");
+        Console.WriteLine($"Parameters: ( SZ:({p.SZx}, {p.SZy}), bfTiles: {p.BfTiles}, repeatL: [{string.Join(",", p.RepeatL)}] )");
     }
 }
 

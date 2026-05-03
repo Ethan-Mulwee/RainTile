@@ -1,6 +1,4 @@
 
-using BigGustave;
-using System.Data.SqlTypes;
 using System.Text.RegularExpressions;
 
     public struct PixelCoordinates {

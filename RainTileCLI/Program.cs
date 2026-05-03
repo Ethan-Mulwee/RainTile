@@ -1,23 +1,23 @@
 ﻿using System.CommandLine;
+using RainTileLib;
 
-namespace scl;
 
 class Program
 {
-    static int Main(string[] args)
-    {
-        Option<FileInfo> fileOption = new("--file")
-        {
-            Description = "The file to read and display on the console"
+    static int Main(string[] args) {
+        Option<FileInfo> fileOption = new("-i", "--input") {
+            Description = "Path to png file used to generate the model"
         };
 
-        RootCommand rootCommand = new("Sample app for System.CommandLine");
+        RootCommand rootCommand = new("Tool for converting Rain World tile graphics to Minecraft JSON models");
         rootCommand.Options.Add(fileOption);
 
-        rootCommand.SetAction(parseResult =>
-        {
+        rootCommand.SetAction(parseResult => {
             FileInfo parsedFile = parseResult.GetValue(fileOption);
-            ReadFile(parsedFile);
+            if (parsedFile.Exists)
+                ReadFile(parsedFile);
+            else 
+                Console.WriteLine("Invalid path");
             return 0;
         });
 

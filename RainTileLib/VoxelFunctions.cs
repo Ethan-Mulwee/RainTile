@@ -6,8 +6,8 @@ using BigGustave;
 public static class VoxelFunctions {
 
 
-    public static VoxelGrid CreateVoxelGrid(Png image, TileInfo info) {
-        int size = Math.Max(Math.Max(info.tileX, info.tileY), info.numLayers);
+    public static VoxelGrid CreateVoxelGrid(TileData tile) {
+        int size = Math.Max(Math.Max(tile.tileX, tile.tileY), tile.numLayers);
 
         VoxelGrid voxelGrid = new VoxelGrid {
             voxels = new Voxel?[size, size, size],
@@ -15,24 +15,24 @@ public static class VoxelFunctions {
         };
 
         // create voxel grid
-        for (int i = 0; i < info.numLayers; i++) {
-            for (int x = 0; x < info.tileX; x++) {
-                for (int y = 0; y < info.tileY; y++) {
-                    PixelCoordinates layerOffset = TileReader.CalculateTopLeftLayerCoordiantes(info, i);
+        for (int i = 0; i < tile.numLayers; i++) {
+            for (int x = 0; x < tile.tileX; x++) {
+                for (int y = 0; y < tile.tileY; y++) {
+                    PixelCoordinates layerOffset = TileConversion.CalculateTopLeftLayerCoordiantes(tile, i);
                     PixelCoordinates imageCoords = new PixelCoordinates { X = layerOffset.X + x, Y = layerOffset.Y + y };
-                    Pixel pixel = image.GetPixel(imageCoords.X, imageCoords.Y);
+                    Pixel pixel = tile.image.GetPixel(imageCoords.X, imageCoords.Y);
                     if ((pixel.R * pixel.G * pixel.B) == 0) {
-                        voxelGrid.voxels[x, y, (info.numLayers - i)] = new Voxel {
+                        voxelGrid.voxels[x, y, (tile.numLayers - i)] = new Voxel {
                             span = new VoxelSpan {
                                 from = new Vector3Int {
                                     X = x,
                                     Y = y,
-                                    Z = (info.numLayers - i)
+                                    Z = (tile.numLayers - i)
                                 },
                                 to = new Vector3Int {
                                     X = x + 1,
                                     Y = y + 1,
-                                    Z = (info.numLayers - i) + 1
+                                    Z = (tile.numLayers - i) + 1
                                 },
                             }
                         };
@@ -48,6 +48,7 @@ public static class VoxelFunctions {
 
     public enum MergingType {
         XY,
+        None,
         XYZ
     }
 

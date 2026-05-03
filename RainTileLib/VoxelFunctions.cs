@@ -14,6 +14,13 @@ public static class VoxelFunctions {
             size = size
         };
 
+        PixelCoordinates topLeft = new PixelCoordinates{X=0, Y=0};
+        Pixel topLeftPixel = tile.image.GetPixel(0,0);
+        if (topLeftPixel.R + topLeftPixel.G + topLeftPixel.B != 0) {
+            Console.WriteLine("Warning: black pixel is not in the top left, some tiles are like this for some reason");
+        }
+
+
         // create voxel grid
         for (int i = 0; i < tile.numLayers; i++) {
             for (int x = 0; x < tile.tileX; x++) {

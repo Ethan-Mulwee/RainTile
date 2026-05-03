@@ -35,6 +35,7 @@ class Program
         RootCommand rootCommand = new("Tool for converting Rain World tile graphics to Minecraft JSON models");
         rootCommand.Add(tilePathArgument);
         rootCommand.Options.Add(initPathOption);
+        rootCommand.Options.Add(outputPathOption);
         rootCommand.Options.Add(yesOption);
         rootCommand.Options.Add(shellOption);
         rootCommand.Options.Add(mergeVerticalOption);
@@ -42,9 +43,12 @@ class Program
         rootCommand.SetAction(parseResult => {
             FileInfo? tilePathInfo = parseResult.GetValue(tilePathArgument);
             FileInfo? initPathInfoNullable = parseResult.GetValue(initPathOption);
+            FileInfo? outputPathInfoNullable = parseResult.GetValue(outputPathOption);
             bool yesOptionValue = parseResult.GetValue(yesOption);
 
-            if (!tilePathInfo.Exists) {
+
+
+            if (tilePathInfo == null || !tilePathInfo.Exists) {
                 Console.WriteLine($"Error: Invalid tile image path '{tilePathInfo}'");
                 return;
             }
@@ -82,7 +86,6 @@ class Program
                     Console.WriteLine("Failed to solve for parameters");
                     return;
                 }
-                // Console.WriteLine("TODO: add option to detect parameters from image");
             }
             TileParameters tileParameters = tileParametersNullable.Value;
             Console.WriteLine($"Tile '{tileName}', parameters detected from ${initPath}");
@@ -101,6 +104,14 @@ class Program
             string tileJson = ConvertVoxelToJson(tile, $"{tileName}", tileGrid);
 
             string outputTilePath = $"{tileName}.json";
+            if (outputPathInfoNullable != null) {
+                if (outputPathInfoNullable.Directory.Exists) {
+                    outputTilePath = outputPathInfoNullable.FullName;
+                } else {
+                    Console.WriteLine("Error: invalid output path aborting");
+                    return;
+                }
+            }
             if (Path.Exists(outputTilePath) && !yesOptionValue) {
                 Console.Write($"'{outputTilePath}' already exists would you like to overwrite it? [y/N]: ");
                 string response = Console.ReadLine();

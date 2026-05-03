@@ -8,11 +8,15 @@ using static RainTileLib.VoxelFunctions;
 class Program
 {
     static int Main(string[] args) {
-        Option<FileInfo> tilePathOption = new("-t", "--tilePath") {
+        Argument<FileInfo> tilePathArgument = new("tilePath") {
             Description = "Path to png file used to generate the model"
         };
 
-        Option<FileInfo> initPathOption = new("-i", "--initPath") {
+        Option<FileInfo> initPathOption = new("-i", "--initPath", "--init") {
+            Description = "Set an explict path to Init.txt file used to set tile parameters. Otherwise Init.txt is expected to be in the same directory as the image"
+        };
+
+        Option<FileInfo> outputPathOption = new("-o", "--outputPath", "--output") {
             Description = "Set an explict path to Init.txt file used to set tile parameters. Otherwise Init.txt is expected to be in the same directory as the image"
         };
 
@@ -29,14 +33,14 @@ class Program
         };
 
         RootCommand rootCommand = new("Tool for converting Rain World tile graphics to Minecraft JSON models");
-        rootCommand.Options.Add(tilePathOption);
+        rootCommand.Add(tilePathArgument);
         rootCommand.Options.Add(initPathOption);
         rootCommand.Options.Add(yesOption);
         rootCommand.Options.Add(shellOption);
         rootCommand.Options.Add(mergeVerticalOption);
 
         rootCommand.SetAction(parseResult => {
-            FileInfo? tilePathInfo = parseResult.GetValue(tilePathOption);
+            FileInfo? tilePathInfo = parseResult.GetValue(tilePathArgument);
             FileInfo? initPathInfoNullable = parseResult.GetValue(initPathOption);
             bool yesOptionValue = parseResult.GetValue(yesOption);
 
@@ -63,8 +67,8 @@ class Program
             }
             TileParameters? tileParametersNullable = GetTileParameters(tileName, initPath);
             if (tileParametersNullable == null) {
-                Console.WriteLine($"Error: failed to find entry for '${tileName}' in Init.txt");
-                Console.WriteLine("TODO: add option to detect params from image");
+                Console.WriteLine($"Error: failed to find entry for '{tileName}' in Init.txt");
+                Console.WriteLine("TODO: add option to detect parameters from image");
                 return;
             }
             TileParameters tileParameters = tileParametersNullable.Value;
@@ -75,6 +79,8 @@ class Program
             Png tilePng = Png.Open(tileStream);
             tileStream.Close();
 
+            Console.WriteLine($"{tilePng.Width}, {tilePng.Height}");
+
             TileData tile = CreateTileData(tilePng, tileParameters);
             
             ConversionSettings settings = new ConversionSettings{
@@ -83,10 +89,10 @@ class Program
             };
 
             VoxelGrid tileGrid = ConvertTileToVoxel(tile, settings);
-            string tileJson = ConvertVoxelToJson(tile, $"{tileName}.png", tileGrid);
+            string tileJson = ConvertVoxelToJson(tile, $"{tileName}", tileGrid);
 
             string outputTilePath = $"{tileName}.json";
-            if (Path.Exists(outputTilePath)) {
+            if (Path.Exists(outputTilePath) && !yesOptionValue) {
                 Console.Write($"'{outputTilePath}' already exists would you like to overwrite it? [y/N]: ");
                 string response = Console.ReadLine();
                 switch (response) {

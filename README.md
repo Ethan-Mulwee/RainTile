@@ -13,3 +13,8 @@ the output file will be put in the current directory and named automatically if 
 ```bash
 ./RainTileCLI "Background AC Fan.png" -o fizz/buzz.json
 ```
+
+If you want to automatically convert all the files in a directory with bash you can do this
+```bash
+for f in *.png; do ./RainTileCLI "$f" -n; done
+```

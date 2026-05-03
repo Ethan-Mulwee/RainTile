@@ -21,7 +21,11 @@ class Program
         };
 
         Option<bool> yesOption = new("-y", "--yes") {
-            Description = "Default to yes when coming to an option"
+            Description = "Default to yes when coming to an option for example whether you want to overwrite an existing file"
+        };
+
+        Option<bool> noOption = new("-n", "--no") {
+            Description = "Default to no when coming to an option"
         };
 
         Option<bool> shellOption = new("--shell") {
@@ -37,6 +41,7 @@ class Program
         rootCommand.Options.Add(initPathOption);
         rootCommand.Options.Add(outputPathOption);
         rootCommand.Options.Add(yesOption);
+        rootCommand.Options.Add(noOption);
         // rootCommand.Options.Add(shellOption);
         // rootCommand.Options.Add(mergeVerticalOption); TODO: implement 
 
@@ -45,6 +50,7 @@ class Program
             FileInfo? initPathInfoNullable = parseResult.GetValue(initPathOption);
             FileInfo? outputPathInfoNullable = parseResult.GetValue(outputPathOption);
             bool yesOptionValue = parseResult.GetValue(yesOption);
+            bool noOptionValue = parseResult.GetValue(noOption);
 
 
 
@@ -68,8 +74,6 @@ class Program
             Stream tileStream = new FileStream(tilePath, FileMode.Open, FileAccess.Read, FileShare.Read);
             Png tilePng = Png.Open(tileStream);
             tileStream.Close();
-
-            Console.WriteLine($"{tilePng.Width}, {tilePng.Height}");
 
             if (!Path.Exists(initPath)) {
                 Console.WriteLine($"Error: Could not find Init.txt at ${initPath}");
@@ -123,6 +127,10 @@ class Program
 
 
             if (Path.Exists(outputTilePath) && !yesOptionValue) {
+                if (noOptionValue) {
+                        Console.WriteLine("File already exists aborting");
+                        return;
+                }
                 Console.Write($"'{outputTilePath}' already exists would you like to overwrite it? [y/N]: ");
                 string response = Console.ReadLine();
                 switch (response) {

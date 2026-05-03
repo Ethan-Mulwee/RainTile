@@ -175,12 +175,8 @@ public static class TileConversion {
         };
     }
 
-    public static TileParameters? GetTileParameters(string imagePath) {
-        string folder = Path.GetDirectoryName(imagePath);
-        string initPath = folder + "/Init.txt";
+    public static TileParameters? GetTileParameters(string tileName, string initPath) {
         string initText = File.ReadAllText(initPath);
-
-        string imageName = Path.GetFileNameWithoutExtension(imagePath);
 
         Regex nameRegex = new Regex("#nm\\s*:\\s*\"([^\"]*)\"", RegexOptions.IgnoreCase);
         Regex szRegex = new Regex(@"#sz\s*:\s*point\s*\(\s*(\d+)\s*,\s*(\d+)\s*\)", RegexOptions.IgnoreCase);
@@ -215,7 +211,7 @@ public static class TileConversion {
 
             string name = nameMatch.Groups[1].Value;
 
-            if (!string.Equals(name, imageName, StringComparison.OrdinalIgnoreCase)) {
+            if (!string.Equals(name, tileName, StringComparison.OrdinalIgnoreCase)) {
                 continue;
             }
 
@@ -248,6 +244,10 @@ public static class TileConversion {
         }
 
         return null;
+    }
+
+    public static void LogParameters(TileParameters p) {
+        Console.WriteLine($"SZ:({p.SZx}, {p.SZy}), bfTiles: {p.BfTiles}, ");
     }
 }
 

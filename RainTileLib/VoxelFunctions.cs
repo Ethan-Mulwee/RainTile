@@ -1,4 +1,6 @@
 
+using System.Runtime.CompilerServices;
+
 namespace RainTileLib;
 
 
@@ -49,6 +51,45 @@ public static class VoxelFunctions {
 
         return voxelGrid;
     }
+
+    public static void RemoveInteriorVoxels(VoxelGrid grid) {
+        VoxelGrid newGrid = new VoxelGrid{
+            voxels = new Voxel?[grid.size, grid.size, grid.size],
+            size = grid.size
+        };
+
+        // remove interior voxels NOTE: doing this before mergin will raise cube count this raises cube count
+        for (int z = 0; z < grid.size; z++) {
+            for (int y = 0; y < grid.size; y++) {
+                for (int x = 0; x < grid.size; x++) {
+                    Voxel? voxelN = grid.voxels[x,y,z];
+                    bool up = false;
+                    bool down = false;
+                    bool north = false;
+                    bool south = false;
+                    bool east = false;
+                    bool west = false;
+                    if (voxelN != null) {
+                        if (x+1 < grid.size && grid.voxels[x+1, y, z] != null) east = true;
+                        if (x-1 > 0 && grid.voxels[x-1, y, z] != null) west = true;
+                        if (y+1 < grid.size && grid.voxels[x, y+1, z] != null) north = true;
+                        if (y-1 > 0 && grid.voxels[x, y-1, z] != null) south = true;
+                        if (z+1 < grid.size && grid.voxels[x, y, z+1] != null) up = true;
+                        if (z-1 > 0 && grid.voxels[x, y, z-1] != null) down = true;
+                    }
+
+                    if (up && down && north && south && east && west) {
+                        newGrid.voxels[x,y,z] = null;
+                    } else {
+                        newGrid.voxels[x,y,z] = voxelN;
+                    }
+                }
+            }
+        }
+        
+        grid.voxels = newGrid.voxels; 
+    }
+
 
     /* ------------------------------ Optimization ------------------------------ */
 

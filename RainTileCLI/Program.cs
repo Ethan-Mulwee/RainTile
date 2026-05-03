@@ -41,7 +41,7 @@ class Program
         rootCommand.Options.Add(outputPathOption);
         rootCommand.Options.Add(yesOption);
         rootCommand.Options.Add(noOption);
-        rootCommand.Options.Add(shellOption);  // TODO: implement 
+        rootCommand.Options.Add(shellOption); 
         rootCommand.Options.Add(mergeVerticalOption);
 
         rootCommand.SetAction(parseResult => {

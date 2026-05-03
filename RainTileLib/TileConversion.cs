@@ -21,8 +21,7 @@ public static class TileConversion {
 
         VoxelGrid grid = CreateVoxelGrid(tile);
 
-        // if settings.shell cull the interior before merge
-        
+        if (settings.shell) RemoveInteriorVoxels(grid);
 
         MergeOptimize(grid, settings.mergeType);
 

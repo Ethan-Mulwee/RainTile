@@ -1,6 +1,6 @@
 namespace RainTileLib;
 
-public struct VoxelGrid {
+public class VoxelGrid {
     public Voxel?[,,] voxels;
     public int size;
 }

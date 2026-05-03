@@ -167,11 +167,45 @@ public static class TileConversion {
     }
 
 
+
     public static PixelCoordinates CalculateTopLeftLayerCoordiantes(TileData tileInfo, int layerIndex) {
         
         return new PixelCoordinates {
             X = 0,
             Y = (layerIndex * tileInfo.tileY)+1
+        };
+    }
+
+    public static TileParameters? TryDetectParameters(Png image) {
+
+        int sx = image.Width / 20;
+        int sy = -1;
+        int numLayers = -1;
+        for (int a = 0; a < 10; a++) {
+            for (int b = 0; b < 10; b++) {
+                int bound = a*b*20+a*16;
+                if (bound == image.Height-1) {
+                    sy = a;
+                    numLayers = b;
+                }
+            }
+        }
+
+        if (sy == -1) {
+            return null;
+        }
+
+        int[] repeatL = new int[numLayers];
+        for (int i = 0; i < numLayers; i++) {
+            repeatL[i] = 1;
+        }
+        repeatL[0] = 11-numLayers;
+
+        return new TileParameters {
+                SZx = sx,
+                SZy = sy,
+                BfTiles = 0,
+                RepeatL = repeatL
         };
     }
 

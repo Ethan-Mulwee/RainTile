@@ -4,7 +4,7 @@ namespace RainTileLib;
 
 public static class MinecraftExportConstants {
     public const string FORMAT_VERSION = "1.21.11";
-    public const string CREDIT = "Rainworld to JSON";
+    public const string CREDIT = "RainTile 1.0.0";
 }
 
 public struct MinecraftJSON {

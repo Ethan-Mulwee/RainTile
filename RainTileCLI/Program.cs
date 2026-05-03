@@ -60,6 +60,12 @@ class Program
                 initPath = Path.Join(tileDirectory, "Init.txt");
             }
 
+            Stream tileStream = new FileStream(tilePath, FileMode.Open, FileAccess.Read, FileShare.Read);
+            Png tilePng = Png.Open(tileStream);
+            tileStream.Close();
+
+            Console.WriteLine($"{tilePng.Width}, {tilePng.Height}");
+
             if (!Path.Exists(initPath)) {
                 Console.WriteLine($"Error: Could not find Init.txt at ${initPath}");
                 Console.WriteLine("TODO: add option to detect params from image");
@@ -68,18 +74,21 @@ class Program
             TileParameters? tileParametersNullable = GetTileParameters(tileName, initPath);
             if (tileParametersNullable == null) {
                 Console.WriteLine($"Error: failed to find entry for '{tileName}' in Init.txt");
-                Console.WriteLine("TODO: add option to detect parameters from image");
-                return;
+                TileParameters? parametersNullable = TryDetectParameters(tilePng);
+                if (parametersNullable is TileParameters parameters) {
+                    Console.WriteLine("Attempting to solve for parameters by image dimensions, NOTE: this only works if the image is correctly sized and contains only a one set of sprites and if there is only one solution");
+                    tileParametersNullable = parametersNullable;
+                } else {
+                    Console.WriteLine("Failed to solve for parameters");
+                    return;
+                }
+                // Console.WriteLine("TODO: add option to detect parameters from image");
             }
             TileParameters tileParameters = tileParametersNullable.Value;
             Console.WriteLine($"Tile '{tileName}', parameters detected from ${initPath}");
             LogParameters(tileParametersNullable.Value);
 
-            Stream tileStream = new FileStream(tilePath, FileMode.Open, FileAccess.Read, FileShare.Read);
-            Png tilePng = Png.Open(tileStream);
-            tileStream.Close();
 
-            Console.WriteLine($"{tilePng.Width}, {tilePng.Height}");
 
             TileData tile = CreateTileData(tilePng, tileParameters);
             

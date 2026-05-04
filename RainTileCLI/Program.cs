@@ -75,25 +75,38 @@ class Program
             Png tilePng = Png.Open(tileStream);
             tileStream.Close();
 
+            TileParameters? tileParametersNullable;
             if (!Path.Exists(initPath)) {
                 Console.WriteLine($"Error: Could not find Init.txt at ${initPath}");
-                Console.WriteLine("TODO: add option to detect params from image");
-                return;
-            }
-            TileParameters? tileParametersNullable = GetTileParameters(tileName, initPath);
-            if (tileParametersNullable == null) {
-                Console.WriteLine($"Error: failed to find entry for '{tileName}' in Init.txt");
                 TileParameters? parametersNullable = TryDetectParameters(tilePng);
                 if (parametersNullable is TileParameters parameters) {
-                    Console.WriteLine("Attempting to solve for parameters by image dimensions, NOTE: this only works if the image is correctly sized and contains only a one set of sprites and if there is only one solution");
                     tileParametersNullable = parametersNullable;
                 } else {
-                    Console.WriteLine("Failed to solve for parameters");
+                    Console.WriteLine("Failed to solve for parameters aborting");
                     return;
                 }
+                
+            } else {
+                tileParametersNullable = GetTileParameters(tileName, initPath);
+                if (tileParametersNullable == null) {
+                    Console.WriteLine($"Error: failed to find entry for '{tileName}' in Init.txt");
+                    TileParameters? parametersNullable = TryDetectParameters(tilePng);
+                    if (parametersNullable is TileParameters parameters) {
+                        Console.WriteLine("Attempting to solve for parameters by image dimensions, NOTE: this only works if the image is correctly sized and contains only a one set of sprites and if there is only one solution");
+                        tileParametersNullable = parametersNullable;
+                    } else {
+                        Console.WriteLine("Failed to solve for parameters aborting");
+                        return;
+                    }
+                }
             }
+
             TileParameters tileParameters = tileParametersNullable.Value;
-            Console.WriteLine($"Tile '{tileName}', parameters detected from ${initPath}");
+            if (Path.Exists(initPath)) {
+                Console.WriteLine($"Tile '{tileName}', parameters detected from ${initPath}");
+            } else {
+                Console.WriteLine($"Tile '{tileName}', Warning: parameters auto detected from image dimensions");
+            }
             LogParameters(tileParametersNullable.Value);
 
 

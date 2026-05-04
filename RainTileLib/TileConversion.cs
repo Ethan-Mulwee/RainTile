@@ -177,22 +177,29 @@ public static class TileConversion {
 
     public static TileParameters? TryDetectParameters(Png image) {
 
-        int sx = image.Width / 20;
         int sy = -1;
         int numLayers = -1;
-        for (int a = 1; a < 10; a++) {
-            for (int b = 1; b < 10; b++) {
-                int bound = a*b*20+a*16;
-                if (bound == image.Height-1) {
-                    sy = a;
-                    numLayers = b;
+        int bfTiles = -1;
+        // guesses different values for bfTiles numLayers and SZy until it finds a set that matches the image height, prefers solutions that use less bfTiles
+        for (int bfTilesGuess = 0; bfTilesGuess < 3; bfTilesGuess++) {
+            for (int syGuess = 1; syGuess < 10; syGuess++) {
+                for (int numLayersGuess = 1; numLayersGuess < 10; numLayersGuess++) {
+                    int bound = ((syGuess+(bfTilesGuess*2))*numLayersGuess*20)+(syGuess*16);
+                    if (bound == image.Height-1) {
+                        sy = syGuess;
+                        numLayers = numLayersGuess;
+                        bfTiles = bfTilesGuess;
+                        goto BreakLoop;
+                    }
                 }
             }
         }
-
+        BreakLoop:
         if (sy == -1) {
             return null;
         }
+
+        int sx = (image.Width / 20) - bfTiles*2;
 
         int[] repeatL = new int[numLayers];
         for (int i = 0; i < numLayers; i++) {
@@ -203,7 +210,7 @@ public static class TileConversion {
         return new TileParameters {
                 SZx = sx,
                 SZy = sy,
-                BfTiles = 0,
+                BfTiles = bfTiles,
                 RepeatL = repeatL
         };
     }

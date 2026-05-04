@@ -16,7 +16,7 @@ class Program
         };
 
         Option<FileInfo> outputPathOption = new("-o", "--outputPath", "--output") {
-            Description = "Set an explict path to Init.txt file used to set tile parameters. Otherwise Init.txt is expected to be in the same directory as the image"
+            Description = "Set a output path, if you provide a path that defines a file then the file will be named as you provided. Otherwise the file will be outputed to the directory"
         };
 
         Option<bool> yesOption = new("-y", "--yes") {

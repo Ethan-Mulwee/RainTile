@@ -32,7 +32,7 @@ class Program
         };
 
         Option<bool> mergeVerticalOption = new("--merge-vertical") {
-            Description = "Remove all interior voxels from generated model"
+            Description = "Allowing merging cubes between layers to maximize model optimization, this makes it a little harder to edit the generated model so it is disabled by default"
         };
 
         RootCommand rootCommand = new("Tool for converting Rain World tile graphics to Minecraft JSON models");

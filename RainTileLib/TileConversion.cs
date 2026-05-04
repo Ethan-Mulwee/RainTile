@@ -25,6 +25,8 @@ public static class TileConversion {
 
         MergeOptimize(grid, settings.mergeType);
 
+        SetVoxelVisibility(grid);
+
         return grid;
     }
 
@@ -68,6 +70,51 @@ public static class TileConversion {
 
             float ModelScaleFactor = 16.0f / 20.0f;
 
+            MinecraftFace? northFace = null;
+            if (voxel.visibility.north) {
+                northFace = new MinecraftFace {
+                    uv = new float[] { U2, V1, U1, V1 + (1 * UVScaleFactorV) },
+                    texture = "#0"
+                };
+            }
+            MinecraftFace? eastFace = null;
+            if (voxel.visibility.east) {
+                eastFace = new MinecraftFace {
+                    uv = new float[] { U2, V1, U2 - (1 * UVScaleFactorU), V2 },
+                    rotation = 90,
+                    texture = "#0"
+                };
+            }
+            MinecraftFace? southFace = null;
+            if (voxel.visibility.south) {
+                southFace = new MinecraftFace {
+                    uv = new float[] { U1, V2 - (1 * UVScaleFactorV), U2, V2 },
+                    texture = "#0"
+                };
+            }
+            MinecraftFace? westFace = null;
+            if (voxel.visibility.west) {
+                westFace = new MinecraftFace {
+                    uv = new float[] { U1 + (1 * UVScaleFactorU), V2, U1, V1 },
+                    rotation = 90,
+                    texture = "#0"
+                };
+            }
+            MinecraftFace? upFace = null;
+            if (voxel.visibility.up) {
+                upFace = new MinecraftFace {
+                    uv = new float[] { U1, V1, U2, V2 },
+                    texture = "#0"
+                };
+            }
+            MinecraftFace? downFace = null;
+            if (voxel.visibility.down) {
+                downFace = new MinecraftFace {
+                    uv = new float[] { U1, V2, U2, V1 },
+                    texture = "#0"
+                };
+            }
+
             elementList.Add(new MinecraftElement {
                 from = new float[] { (voxel.span.from.X - 16) * ModelScaleFactor, (voxel.span.from.Z) * ModelScaleFactor, (voxel.span.from.Y - 16) * ModelScaleFactor },
                 to = new float[] { (voxel.span.to.X - 16) * ModelScaleFactor, (voxel.span.to.Z) * ModelScaleFactor, (voxel.span.to.Y - 16) * ModelScaleFactor },
@@ -78,32 +125,12 @@ public static class TileConversion {
                 },
                 color = 7,
                 faces = new MinecraftFaces {
-                    north = new MinecraftFace {
-                        uv = new float[] { U2, V1, U1, V1 + (1 * UVScaleFactorV) },
-                        texture = "#0"
-                    },
-                    east = new MinecraftFace {
-                        uv = new float[] { U2, V1, U2 - (1 * UVScaleFactorU), V2 },
-                        rotation = 90,
-                        texture = "#0"
-                    },
-                    south = new MinecraftFace {
-                        uv = new float[] { U1, V2 - (1 * UVScaleFactorV), U2, V2 },
-                        texture = "#0"
-                    },
-                    west = new MinecraftFace {
-                        uv = new float[] { U1 + (1 * UVScaleFactorU), V2, U1, V1 },
-                        rotation = 90,
-                        texture = "#0"
-                    },
-                    up = new MinecraftFace {
-                        uv = new float[] { U1, V1, U2, V2 },
-                        texture = "#0"
-                    },
-                    down = new MinecraftFace {
-                        uv = new float[] { U1, V2, U2, V1 },
-                        texture = "#0"
-                    },
+                    north = northFace,
+                    east = eastFace,
+                    south = southFace,
+                    west = westFace,
+                    up = upFace,
+                    down = downFace,
                 }
             });
         }

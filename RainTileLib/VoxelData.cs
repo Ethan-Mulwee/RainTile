@@ -10,8 +10,19 @@ public struct VoxelSpan {
     public Vector3Int to;
 }
 
-public struct Voxel {
+// TODO: look into optimzing this with a single byte, using bit wise operations
+public struct VoxelVisibility {
+    public bool north;
+    public bool east;
+    public bool south;
+    public bool west;
+    public bool up;
+    public bool down;
+}
+
+public class Voxel {
     public VoxelSpan span;
+    public VoxelVisibility visibility;
 }
 
 public struct Vector3Int {

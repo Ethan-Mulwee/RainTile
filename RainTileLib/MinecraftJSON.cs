@@ -46,12 +46,12 @@ public struct MinecraftRotation {
 }
 
 public struct MinecraftFaces {
-    public MinecraftFace north { get; set; }
-    public MinecraftFace east { get; set; }
-    public MinecraftFace south { get; set; }
-    public MinecraftFace west { get; set; }
-    public MinecraftFace up { get; set; }
-    public MinecraftFace down { get; set; }
+    public MinecraftFace? north { get; set; }
+    public MinecraftFace? east { get; set; }
+    public MinecraftFace? south { get; set; }
+    public MinecraftFace? west { get; set; }
+    public MinecraftFace? up { get; set; }
+    public MinecraftFace? down { get; set; }
 }
 
 public struct MinecraftFace {

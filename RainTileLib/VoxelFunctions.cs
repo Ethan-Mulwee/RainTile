@@ -42,6 +42,14 @@ public static class VoxelFunctions {
                                     Y = y + 1,
                                     Z = (tile.numLayers - i) + 1
                                 },
+                            },
+                            visibility = new VoxelVisibility {
+                                north = true,
+                                east = true,
+                                south = true,
+                                west = true,
+                                up = true,
+                                down = true
                             }
                         };
                     }
@@ -58,7 +66,7 @@ public static class VoxelFunctions {
             size = grid.size
         };
 
-        // remove interior voxels NOTE: doing this before mergin will raise cube count this raises cube count
+        // remove interior voxels NOTE: doing this before merging will raise cube count this raises cube count
         for (int z = 0; z < grid.size; z++) {
             for (int y = 0; y < grid.size; y++) {
                 for (int x = 0; x < grid.size; x++) {
@@ -88,6 +96,132 @@ public static class VoxelFunctions {
         }
         
         grid.voxels = newGrid.voxels; 
+    }
+
+    public static void SetVoxelVisibility(VoxelGrid grid) {
+
+        VoxelGrid referenceGrid = new VoxelGrid {
+            voxels = new Voxel[grid.size,grid.size,grid.size],
+            size = grid.size
+        };
+
+        // Create grid fully populated with references back to the voxel that spans them
+        foreach (Voxel? voxelNullable in grid.voxels) {
+            if (voxelNullable is Voxel voxel) {
+                // Walk the span of the voxel populating references in the reference grid
+                for (int x = voxel.span.from.X; x < voxel.span.to.X; x++) {
+                    for (int y = voxel.span.from.Y; y < voxel.span.to.Y; y++) {
+                        for (int z = voxel.span.from.Z; z < voxel.span.to.Z; z++) {
+                            referenceGrid.voxels[x,y,z] = voxelNullable;
+                            // if (Object.ReferenceEquals(referenceGrid.voxels[x,y,z], voxelNullable)) {
+                            //     Console.WriteLine("it's working correctly");
+                            // }
+                        }
+                    }
+                }
+            }
+        }
+
+        // Check neighbors of span to see if a face is visible
+        foreach (Voxel? voxelNullable in grid.voxels) {
+            if (voxelNullable is Voxel voxel) {
+
+                VoxelVisibility visibility = new VoxelVisibility(); 
+
+                // Walk upward neighbors, if there is a single voxel empty then 'up' is visible
+                if (voxel.span.to.Z+1 < grid.size) {
+                    int z = voxel.span.to.Z+1;
+                    for (int x = voxel.span.from.X; x < voxel.span.to.X; x++) {
+                        for (int y = voxel.span.from.Y; y < voxel.span.to.Y; y++) {
+                            if (referenceGrid.voxels[x,y,z] == null) {
+                                visibility.up = true;
+                                goto BreakUpLoop;
+                            }
+                        }
+                    }
+                } else {
+                    visibility.up = true;
+                }
+
+                BreakUpLoop:
+                if (voxel.span.from.Z-1 > 0) {
+                    int z = voxel.span.from.Z-1;
+                    for (int x = voxel.span.from.X; x < voxel.span.to.X; x++) {
+                        for (int y = voxel.span.from.Y; y < voxel.span.to.Y; y++) {
+                            if (referenceGrid.voxels[x,y,z] == null) {
+                                visibility.down = true;
+                                goto BreakDownLoop;
+                            }
+                        }
+                    }
+                } else {
+                    visibility.down = true;
+                }
+
+                BreakDownLoop:
+                if (voxel.span.to.X+1 < grid.size) {
+                    int x = voxel.span.to.X+1;
+                    for (int y = voxel.span.from.Y; y < voxel.span.to.Y; y++) {
+                        for (int z = voxel.span.from.Z; z < voxel.span.to.Z; z++) {
+                            if (referenceGrid.voxels[x,y,z] == null) {
+                                visibility.east = true;
+                                goto BreakEastLoop;
+                            }
+                        }
+                    }
+                } else {
+                    visibility.east = true;
+                }
+
+                BreakEastLoop:
+                if (voxel.span.from.X-1 > 0) {
+                    int x = voxel.span.from.X-1;
+                    for (int y = voxel.span.from.Y; y < voxel.span.to.Y; y++) {
+                        for (int z = voxel.span.from.Z; z < voxel.span.to.Z; z++) {
+                            if (referenceGrid.voxels[x,y,z] == null) {
+                                visibility.west = true;
+                                goto BreakWestLoop;
+                            }
+                        }
+                    }
+                } else {
+                    visibility.west = true;
+                }
+
+                BreakWestLoop:
+                if (voxel.span.to.Y+1 < grid.size) {
+                    int y = voxel.span.to.Y+1;
+                    for (int x = voxel.span.from.X; x < voxel.span.to.X; x++) {
+                        for (int z = voxel.span.from.Z; z < voxel.span.to.Z; z++) {
+                            if (referenceGrid.voxels[x,y,z] == null) {
+                                visibility.south = true;
+                                goto BreakSouthLoop;
+                            }
+                        }
+                    }
+                } else {
+                    visibility.south = true;
+                }
+
+                BreakSouthLoop:
+                if (voxel.span.from.Y-1 > 0) {
+                    int y = voxel.span.from.Y-1;
+                    for (int x = voxel.span.from.X; x < voxel.span.to.X; x++) {
+                        for (int z = voxel.span.from.Z; z < voxel.span.to.Z; z++) {
+                            if (referenceGrid.voxels[x,y,z] == null) {
+                                visibility.north = true;
+                                goto BreakNorthLoop;
+                            }
+                        }
+                    }
+                } else {
+                    visibility.north = true;
+                }
+
+                BreakNorthLoop:
+                voxelNullable.visibility = visibility;
+            }
+        }
     }
 
 

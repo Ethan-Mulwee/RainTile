@@ -6,6 +6,7 @@ basic usage
 
 ```bash
 ./RainTileCLI (path to png) 
+./RainTileCLI # Passing no arugments displays --help
 ```
 
 the output file will be put in the current directory and named automatically if no path is specified. Otherwise you can set one with `-o` or `--output`
